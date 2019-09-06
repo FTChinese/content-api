@@ -32,3 +32,15 @@ func (router StoryRouter) Raw(w http.ResponseWriter, req *http.Request) {
 
 	_ = view.Render(w, view.NewResponse().SetBody(story))
 }
+
+func (router StoryRouter) CN(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func (router StoryRouter) EN(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func (router StoryRouter) Bilingual(w http.ResponseWriter, req *http.Request) {
+
+}
