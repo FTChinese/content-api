@@ -9,5 +9,8 @@ func (env Env) RetrieveRawStory(id string) (models.RawStory, error) {
 		return models.RawStory{}, err
 	}
 
+	story.Sanitize()
+	story.SetBilingual()
+
 	return story, nil
 }
