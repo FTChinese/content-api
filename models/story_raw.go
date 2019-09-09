@@ -14,7 +14,7 @@ type RawStory struct {
 	TitleCN        string `json:"titleCn" db:"title_cn"`
 	TitleEN        string `json:"titleEn" db:"title_en"`
 	Standfirst     string `json:"standfirst" db:"standfirst"`
-	CoverURL       string `json:"coverUrl" db:"coverUrl"`
+	CoverURL       string `json:"coverUrl" db:"cover_url"`
 	BylineDescCN   string `json:"bylineDescCn" db:"byline_desc_cn"`
 	BylineDescEN   string `json:"bylineDescEn" db:"byline_desc_en"`
 	BylineAuthorCN string `json:"bylineAuthorCn" db:"byline_author_cn"`
@@ -22,7 +22,7 @@ type RawStory struct {
 	BylineStatusCN string `json:"bylineStatusCn" db:"byline_status_cn"`
 	BylineStatusEN string `json:"bylineStatusEn" db:"byline_status_en"`
 	AccessRight    int64  `json:"accessRight" db:"access_right"`
-	Tag            string `json:"tags" db:"tags"`
+	Tag            string `json:"tags" db:"tag"`
 	Genre          string `json:"genre" db:"genre"`
 	Topic          string `json:"topic" db:"topic"`
 	Industry       string `json:"industry" db:"industry"`
@@ -97,7 +97,7 @@ func (s *RawStory) MetaData() StoryMeta {
 	}
 
 	return StoryMeta{
-		ID:         s.Industry,
+		ID:         s.ID,
 		Areas:      strings.Split(s.Area, ","),
 		Genres:     strings.Split(s.Genre, ","),
 		Industries: strings.Split(s.Industry, ","),
