@@ -1,5 +1,12 @@
 package models
 
+import (
+	"github.com/FTChinese/go-rest/chrono"
+	"github.com/FTChinese/go-rest/enum"
+	"strings"
+	"time"
+)
+
 // RawStory is used to retrieve a story from db as is.
 type RawStory struct {
 	ID             string `json:"id" db:"story_id"`
@@ -14,13 +21,90 @@ type RawStory struct {
 	BylineAuthorEN string `json:"bylineAuthorEn" db:"byline_author_en"`
 	BylineStatusCN string `json:"bylineStatusCn" db:"byline_status_cn"`
 	BylineStatusEN string `json:"bylineStatusEn" db:"byline_status_en"`
-	Tags           string `json:"tags" db:"tags"`
+	AccessRight    int64  `json:"accessRight" db:"access_right"`
+	Tag            string `json:"tags" db:"tags"`
 	Genre          string `json:"genre" db:"genre"`
 	Topic          string `json:"topic" db:"topic"`
 	Industry       string `json:"industry" db:"industry"`
 	Area           string `json:"area" db:"area"`
-	CreatedAt      string `json:"createdAt" db:"created_at"`
-	UpdatedAt      string `json:"updatedAt" db:"updated_at"`
-	BodyCN         string `json:"bodyCn" db:"body_cn"`
-	BodyEN         string `json:"bodyEn" db:"body_en"`
+	CreatedAt      int64  `json:"createdAt" db:"created_at"`
+	UpdatedAt      int64  `json:"updatedAt" db:"updated_at"`
+	RawBody
+}
+
+func (s *RawStory) Sanitize() {
+	s.BodyCN = strings.TrimSpace(s.BodyCN)
+	s.BodyEN = strings.TrimSpace(s.BodyEN)
+}
+
+func (s *RawStory) SetBilingual() {
+	s.Bilingual = s.BodyCN != "" && s.BodyEN != ""
+}
+
+func (s *RawStory) BylineCN() Byline {
+	var authors []Author
+
+	nameGroups := strings.Split(s.BylineAuthorCN, ",")
+	placeGroups := strings.Split(s.BylineStatusCN, ",")
+
+	pairs := AlignStringPairs(nameGroups, placeGroups)
+
+	for _, v := range pairs {
+
+		authors = append(authors, Author{
+			Names: strings.Split(v.First, ";"),
+			Place: v.Second,
+		})
+	}
+
+	return Byline{
+		Organization: s.BylineDescCN,
+		Authors:      authors,
+	}
+}
+
+func (s *RawStory) BylineEN() Byline {
+	var authors []Author
+
+	nameGroups := strings.Split(s.BylineAuthorEN, ",")
+	placeGroups := strings.Split(s.BylineStatusEN, ",")
+
+	pairs := AlignStringPairs(nameGroups, placeGroups)
+
+	for _, v := range pairs {
+
+		authors = append(authors, Author{
+			Names: strings.Split(v.First, ";"),
+			Place: v.Second,
+		})
+	}
+
+	return Byline{
+		Organization: s.BylineDescEN,
+		Authors:      authors,
+	}
+}
+
+func (s *RawStory) MetaData() StoryMeta {
+	var tier enum.Tier
+	switch s.AccessRight {
+	case 1:
+		tier = enum.TierStandard
+	case 2:
+		tier = enum.TierPremium
+	default:
+		tier = enum.InvalidTier
+	}
+
+	return StoryMeta{
+		ID:         s.Industry,
+		Areas:      strings.Split(s.Area, ","),
+		Genres:     strings.Split(s.Genre, ","),
+		Industries: strings.Split(s.Industry, ","),
+		MemberTier: tier,
+		Tags:       strings.Split(s.Tag, ","),
+		Topics:     strings.Split(s.Topic, ","),
+		CreatedAt:  chrono.TimeFrom(time.Unix(s.CreatedAt, 0)),
+		UpdatedAt:  chrono.TimeFrom(time.Unix(s.UpdatedAt, 0)),
+	}
 }
