@@ -44,9 +44,22 @@ func (s *RawStory) SetBilingual() {
 func (s *RawStory) BylineCN() Byline {
 	var authors []Author
 
-	nameGroups := strings.Split(s.BylineAuthorCN, ",")
 	placeGroups := strings.Split(s.BylineStatusCN, ",")
 
+	// Handle irregular format.
+	if len(placeGroups) == 1 && !strings.Contains(s.BylineAuthorCN, ";") {
+		return Byline{
+			Organization: s.BylineDescCN,
+			Authors: []Author{
+				{
+					Names: strings.Split(s.BylineAuthorCN, ","),
+					Place: s.BylineStatusCN,
+				},
+			},
+		}
+	}
+
+	nameGroups := strings.Split(s.BylineAuthorCN, ",")
 	pairs := AlignStringPairs(nameGroups, placeGroups)
 
 	for _, v := range pairs {
@@ -66,9 +79,21 @@ func (s *RawStory) BylineCN() Byline {
 func (s *RawStory) BylineEN() Byline {
 	var authors []Author
 
-	nameGroups := strings.Split(s.BylineAuthorEN, ",")
 	placeGroups := strings.Split(s.BylineStatusEN, ",")
+	// Handle irregular format.
+	if len(placeGroups) == 1 && !strings.Contains(s.BylineAuthorEN, ";") {
+		return Byline{
+			Organization: s.BylineDescEN,
+			Authors: []Author{
+				{
+					Names: strings.Split(s.BylineAuthorEN, ","),
+					Place: s.BylineStatusEN,
+				},
+			},
+		}
+	}
 
+	nameGroups := strings.Split(s.BylineAuthorEN, ",")
 	pairs := AlignStringPairs(nameGroups, placeGroups)
 
 	for _, v := range pairs {
