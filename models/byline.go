@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Byline aggregates byline data
 // {
 //  "organization": "英国《金融时报》",
@@ -17,6 +22,15 @@ package models
 type Byline struct {
 	Organization string   `json:"organization"`
 	Authors      []Author `json:"authors"`
+}
+
+func (b Byline) String() string {
+	var authors []string
+	for _, v := range b.Authors {
+		authors = append(authors, fmt.Sprintf("%s %s", strings.Join(v.Names, ","), v.Place))
+	}
+
+	return fmt.Sprintf("%s %s", b.Organization, strings.Join(authors, ", "))
 }
 
 type Author struct {
