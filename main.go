@@ -63,16 +63,16 @@ func main() {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
 	})
 
-	r.Route("/story/:id", func(r chi.Router) {
+	r.Route("/story/{id}", func(r chi.Router) {
 		r.Get("/", storyRouter.Raw)
 		r.Get("/cn", storyRouter.CN)
 		r.Get("/en", storyRouter.EN)
 		r.Get("/ce", storyRouter.Bilingual)
 	})
 
-	r.Get("/video/:id", videoRouter.Article)
+	r.Get("/video/{id}", videoRouter.Article)
 
-	r.Get("/gallery/:id", galleryRouter.Article)
+	r.Get("/gallery/{id}", galleryRouter.Article)
 
 	logrus.Infof("content-api started on port %s", port)
 
