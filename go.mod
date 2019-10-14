@@ -24,6 +24,7 @@ require (
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/client_golang v1.1.0 // indirect
