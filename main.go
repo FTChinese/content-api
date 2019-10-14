@@ -54,6 +54,7 @@ func main() {
 	storyRouter := controller.NewStoryRouter(db)
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
+	channelRouter := controller.NewChannelRouter(db)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -71,6 +72,11 @@ func main() {
 		}
 
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
+	})
+
+	r.Route("/front_page", func(r chi.Router) {
+		r.Get("/latest", channelRouter.TodayFrontPage)
+		r.Get("/archive/{date}", channelRouter.ArchivedFrontPage)
 	})
 
 	r.Route("/story/{id}", func(r chi.Router) {

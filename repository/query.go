@@ -1,5 +1,41 @@
 package repository
 
+import "fmt"
+
+const (
+	stmtTeasers = `
+    SELECT story.id AS id,
+        story.tag AS tag,
+        story.cheadline AS title,
+        story.clongleadbody AS standfirst,
+        picture.piclink  AS cover_url,
+        FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
+		FROM_UNIXTIME(story.last_publish_time) AS updated_utc
+    FROM cmstmp01.story
+        LEFT JOIN (
+			cmstmp01.story_pic AS storyToPic
+			INNER JOIN cmstmp01.picture AS picture
+		)
+		ON story.id = storyToPic.storyid 
+		AND picture.id = storyToPic.picture_id
+    WHERE story.publish_status = 'publish'
+        %s
+    ORDER BY story.priority,
+        story.fileupdatetime`
+)
+
+// Current front page.
+var stmtTodayStories = fmt.Sprintf(stmtTeasers, `AND story.pubdate = (
+    SELECT pubdate
+    FROM cmstmp01.story
+    WHERE publish_status = 'publish'
+    ORDER BY pubdate DESC
+    LIMIT 1
+)`)
+
+// The front page on a certain date.
+var stmtArchivedTeasers = fmt.Sprintf(stmtTeasers, `AND FROM_UNIXTIME(story.pubdate, "%Y-%m-%d") = ?`)
+
 const (
 	stmtStory = `
     SELECT story.id AS story_id,
@@ -19,8 +55,8 @@ const (
         story.industry AS industry,
 		story.tag AS tag,
         story.topic AS topic,
-		story.fileupdatetime AS created_at,
-		story.last_publish_time AS updated_at,
+		FROM_UNIXTIME(story.fileupdatetime) AS created_at,
+		FROM_UNIXTIME(story.last_publish_time) AS updated_at,
 		story.cbody AS body_cn,
         story.ebody AS body_en
 	FROM cmstmp01.story AS story
