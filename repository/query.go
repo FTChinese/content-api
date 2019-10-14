@@ -137,4 +137,13 @@ const (
     FROM cmstmp01.channel
     WHERE code IS NOT NULL
 	ORDER BY id`
+
+	stmtOAuth = `
+    SELECT access_token,
+        is_active,
+        expires_in,
+        created_utc
+    FROM oauth.access
+    WHERE access_token = UNHEX(?)
+    LIMIT 1`
 )
