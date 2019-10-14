@@ -6,7 +6,7 @@ BUILD := `date +%FT%T%z`
 
 LDFLAGS := -ldflags "-w -s -X main.version=${VERSION} -X main.build=${BUILD}"
 
-.PHONY: build linux deploy attack report lastcommit mkbuild clean
+.PHONY: build linux deploy lastcommit mkbuild clean
 build :
 	go build $(LDFLAGS) -o $(build_dir)/$(BINARY) -v .
 
