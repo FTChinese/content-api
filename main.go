@@ -63,6 +63,16 @@ func main() {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
 	})
 
+	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+		var data = map[string]string{
+			"story":   "/story/{id}/<cn | en | ce>",
+			"video":   "/video/{id}",
+			"gallery": "/gallery/{id}",
+		}
+
+		_ = view.Render(writer, view.NewResponse().SetBody(data))
+	})
+
 	r.Route("/story/{id}", func(r chi.Router) {
 		r.Get("/", storyRouter.Raw)
 		r.Get("/cn", storyRouter.CN)
