@@ -46,24 +46,24 @@ const (
 	WHERE id = ? 
 		AND publish_status = 'publish'`
 
-	stmtGallery = `
-    SELECT photonewsid AS id,
-		cn_title AS title,
-		TRIM('\n' FROM shortlead) AS standFirst,
-		TRIM('\n' FROM leadbody) AS body,
-		cover AS coverUrl,
-		add_times AS updatedAt,
-		tags AS tag
-	FROM cmstmp01.photonews
-	WHERE photonewsid = ?
-	LIMIT 1`
-
 	stmtGalleryImages = `
     SELECT pic_url AS imageUrl,
 		pbody AS caption
 	FROM cmstmp01.photonews_picture
 	WHERE photonewsid = ?
 	ORDER BY orders`
+
+	stmtGallery = `
+    SELECT photonewsid AS id,
+		cn_title AS title,
+		shortlead AS standfirst,
+		leadbody AS body,
+		cover AS coverUrl,
+		add_times AS updatedAt,
+		tags AS tag
+	FROM cmstmp01.photonews
+	WHERE photonewsid = ?
+	LIMIT 1`
 
 	stmtChannel = `
     SELECT story.id AS id,
