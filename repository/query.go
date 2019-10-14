@@ -46,6 +46,40 @@ const (
 	WHERE id = ? 
 		AND publish_status = 'publish'`
 
+	stmtGallery = `
+    SELECT photonewsid AS id,
+		cn_title AS title,
+		TRIM('\n' FROM shortlead) AS standFirst,
+		TRIM('\n' FROM leadbody) AS body,
+		cover AS coverUrl,
+		add_times AS updatedAt,
+		tags AS tag
+	FROM cmstmp01.photonews
+	WHERE photonewsid = ?
+	LIMIT 1`
+
+	stmtGalleryImages = `
+    SELECT pic_url AS imageUrl,
+		pbody AS caption
+	FROM cmstmp01.photonews_picture
+	WHERE photonewsid = ?
+	ORDER BY orders`
+
+	stmtChannel = `
+    SELECT story.id AS id,
+      story.cheadline AS titleCn,
+      story.clongleadbody AS standfirst,
+      story.tag AS tags,
+      story.fileupdatetime AS createdAt,
+      story.last_publish_time AS updatedAt
+    FROM cmstmp01.channel_detail
+      INNER JOIN cmstmp01.story
+      ON channel_detail.id = story.id
+    WHERE channel_detail.chaid = ?
+      AND story.publish_status = 'publish'
+    ORDER BY channel_detail.addtime DESC
+	LIMIT ? OFFSET ?`
+
 	stmtNav = `
     SELECT top.id AS id,
       top.code AS name,
@@ -67,38 +101,4 @@ const (
     FROM cmstmp01.channel
     WHERE code IS NOT NULL
 	ORDER BY id`
-
-	stmtGallery = `
-    SELECT photonewsid AS id,
-		cn_title AS title,
-		TRIM('\n' FROM shortlead) AS standFirst,
-		TRIM('\n' FROM leadbody) AS body,
-		cover AS coverUrl,
-		add_times AS updatedAt,
-		tags AS tags
-	FROM cmstmp01.photonews
-	WHERE photonewsid = ?
-	LIMIT 1`
-
-	stmtGalleryImages = `
-    SELECT TRIM('\n' FROM pic_url) AS imageUrl,
-		TRIM('\n' FROM pbody) AS caption
-	FROM cmstmp01.photonews_picture
-	WHERE photonewsid = ?
-	ORDER BY orders`
-
-	stmtChannel = `
-    SELECT story.id AS id,
-      story.cheadline AS titleCn,
-      story.clongleadbody AS standfirst,
-      story.tag AS tags,
-      story.fileupdatetime AS createdAt,
-      story.last_publish_time AS updatedAt
-    FROM cmstmp01.channel_detail
-      INNER JOIN cmstmp01.story
-      ON channel_detail.id = story.id
-    WHERE channel_detail.chaid = ?
-      AND story.publish_status = 'publish'
-    ORDER BY channel_detail.addtime DESC
-	LIMIT ? OFFSET ?`
 )
