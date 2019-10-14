@@ -51,6 +51,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	accessGuard := controller.AccessGuard{
+		Env: repository.NewOAuthEnv(db),
+	}
 	storyRouter := controller.NewStoryRouter(db)
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
@@ -59,6 +62,8 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	r.Use(accessGuard.CheckToken)
 
 	r.Get("/__version", func(writer http.ResponseWriter, request *http.Request) {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
