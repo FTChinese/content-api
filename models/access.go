@@ -1,11 +1,8 @@
 package models
 
 import (
-	"errors"
 	"github.com/FTChinese/go-rest/chrono"
 	"github.com/guregu/null"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -29,30 +26,4 @@ func (o OAuthAccess) Expired() bool {
 	}
 
 	return false
-}
-
-var errTokenRequired = errors.New("no access credentials provided")
-
-// GetBearerAuth extracts OAuth access token from request header.
-// Authorization: Bearer 19c7d9016b68221cc60f00afca7c498c36c361e3
-func GetBearerAuth(req *http.Request) (string, error) {
-	authHeader := req.Header.Get("Authorization")
-	authForm := req.Form.Get("access_token")
-
-	if authHeader == "" && authForm == "" {
-		return "", errTokenRequired
-	}
-
-	if authHeader == "" && authForm != "" {
-		return authForm, nil
-	}
-
-	s := strings.SplitN(authHeader, " ", 1)
-	bearerExists := (len(s) == 2) && (strings.ToLower(s[0]) == "bearer")
-
-	if !bearerExists {
-		return "", errTokenRequired
-	}
-
-	return s[1], nil
 }
