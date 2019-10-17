@@ -62,6 +62,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(controller.LogRequest)
 
 	r.Use(accessGuard.CheckToken)
 
