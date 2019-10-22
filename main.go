@@ -72,29 +72,33 @@ func main() {
 
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
-			"story":   "/story/{id}/<cn | en | ce>",
-			"video":   "/video/{id}",
-			"gallery": "/gallery/{id}",
+			"home":         "/channels/home/latest",
+			"home_archive": "/channels/home/archive/{date}",
+			"story":        "/story/{id}/<cn | en | ce>",
+			"video":        "/video/{id}",
+			"gallery":      "/gallery/{id}",
 		}
 
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
 	})
 
-	r.Route("/front_page", func(r chi.Router) {
-		r.Get("/latest", channelRouter.TodayFrontPage)
-		r.Get("/archive/{date}", channelRouter.ArchivedFrontPage)
+	r.Route("/channels", func(r chi.Router) {
+		r.Route("/home", func(r chi.Router) {
+			r.Get("/latest", channelRouter.TodayFrontPage)
+			r.Get("/archives/{date}", channelRouter.ArchivedFrontPage)
+		})
 	})
 
-	r.Route("/story/{id}", func(r chi.Router) {
+	r.Route("/stories/{id}", func(r chi.Router) {
 		r.Get("/", storyRouter.Raw)
 		r.Get("/cn", storyRouter.CN)
 		r.Get("/en", storyRouter.EN)
 		r.Get("/ce", storyRouter.Bilingual)
 	})
 
-	r.Get("/video/{id}", videoRouter.Article)
+	r.Get("/videos/{id}", videoRouter.Article)
 
-	r.Get("/gallery/{id}", galleryRouter.Article)
+	r.Get("/galleries/{id}", galleryRouter.Article)
 
 	logrus.Infof("content-api started on port %s", port)
 
