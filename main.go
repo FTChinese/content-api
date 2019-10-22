@@ -18,7 +18,7 @@ import (
 var (
 	buildConfig config.BuildConfig
 	version     string
-	buildAt     string
+	build       string
 )
 
 const port = "8100"
@@ -30,9 +30,12 @@ func init() {
 	flag.Parse()
 
 	if *v {
-		fmt.Printf("%s\nBuild at %s\n", version, buildAt)
+		fmt.Printf("%s\nBuild at %s\n", version, build)
 		os.Exit(0)
 	}
+
+	buildConfig.Version = version
+	buildConfig.BuiltAt = build
 
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetOutput(os.Stdout)
