@@ -31,6 +31,10 @@ type RawStory struct {
 	RawBody
 }
 
+func (s *RawStory) Normalize() {
+	s.CoverURL = imageBaseURL + s.CoverURL
+}
+
 func (s *RawStory) Sanitize() {
 	s.BodyCN = strings.TrimSpace(s.BodyCN)
 	s.BodyEN = strings.TrimSpace(s.BodyEN)
