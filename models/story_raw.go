@@ -32,7 +32,7 @@ type RawStory struct {
 }
 
 func (s *RawStory) Normalize() {
-	s.CoverURL = imageBaseURL + s.CoverURL
+	//s.CoverURL = imageBaseURL + s.CoverURL
 	s.Bilingual = s.BodyCN != "" && s.BodyEN != ""
 }
 
