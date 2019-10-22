@@ -74,9 +74,9 @@ func main() {
 		var data = map[string]string{
 			"home":         "/channels/home/latest",
 			"home_archive": "/channels/home/archive/{date}",
-			"story":        "/story/{id}/<cn | en | ce>",
-			"video":        "/video/{id}",
-			"gallery":      "/gallery/{id}",
+			"story":        "/stories/{id}/<cn | en | ce>",
+			"video":        "/videos/{id}",
+			"gallery":      "/galleries/{id}",
 		}
 
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
