@@ -8,7 +8,7 @@ import (
 func (env Env) TodayFrontPage() (models.FrontPage, error) {
 	var teasers = []models.Teaser{}
 
-	if err := env.db.Select(&teasers, stmtTodayStories); err != nil {
+	if err := env.db.Select(&teasers, stmtFrontPageToday); err != nil {
 		return models.FrontPage{}, err
 	}
 
@@ -32,7 +32,7 @@ func (env Env) TodayFrontPage() (models.FrontPage, error) {
 func (env Env) ArchivedFrontPage(date string) (models.ArchivedFrontPage, error) {
 	var teasers = []models.Teaser{}
 
-	if err := env.db.Select(&teasers, stmtArchivedTeasers, date); err != nil {
+	if err := env.db.Select(&teasers, stmtFrontPageArchive, date); err != nil {
 		return models.ArchivedFrontPage{}, err
 	}
 
