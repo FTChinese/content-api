@@ -33,15 +33,12 @@ type RawStory struct {
 
 func (s *RawStory) Normalize() {
 	s.CoverURL = imageBaseURL + s.CoverURL
+	s.Bilingual = s.BodyCN != "" && s.BodyEN != ""
 }
 
 func (s *RawStory) Sanitize() {
 	s.BodyCN = strings.TrimSpace(s.BodyCN)
 	s.BodyEN = strings.TrimSpace(s.BodyEN)
-}
-
-func (s *RawStory) SetBilingual() {
-	s.Bilingual = s.BodyCN != "" && s.BodyEN != ""
 }
 
 func (s *RawStory) BylineCN() Byline {

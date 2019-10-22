@@ -10,7 +10,7 @@ func (env Env) RetrieveRawStory(id string) (models.RawStory, error) {
 	}
 
 	story.Sanitize()
-	story.SetBilingual()
+	story.Normalize()
 
 	return story, nil
 }
