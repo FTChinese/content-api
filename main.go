@@ -76,7 +76,7 @@ func main() {
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
 			"home":         "/channels/home/latest",
-			"home_archive": "/channels/home/archive/{date}",
+			"home_archive": "/channels/home/archives/{date}",
 			"story":        "/stories/{id}/<cn | en | ce>",
 			"video":        "/videos/{id}",
 			"gallery":      "/galleries/{id}",
