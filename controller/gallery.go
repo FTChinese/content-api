@@ -8,11 +8,11 @@ import (
 )
 
 type GalleryRouter struct {
-	env repository.Env
+	env repository.ContentEnv
 }
 
 func NewGalleryStory(db *sqlx.DB) GalleryRouter {
-	return GalleryRouter{env: repository.NewEnv(db)}
+	return GalleryRouter{env: repository.NewContentEnv(db)}
 }
 
 func (router GalleryRouter) Article(w http.ResponseWriter, req *http.Request) {

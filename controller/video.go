@@ -8,11 +8,11 @@ import (
 )
 
 type VideoRouter struct {
-	env repository.Env
+	env repository.ContentEnv
 }
 
 func NewVideoRouter(db *sqlx.DB) VideoRouter {
-	return VideoRouter{env: repository.NewEnv(db)}
+	return VideoRouter{env: repository.NewContentEnv(db)}
 }
 
 func (router VideoRouter) Article(w http.ResponseWriter, req *http.Request) {

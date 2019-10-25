@@ -9,12 +9,12 @@ import (
 )
 
 type StoryRouter struct {
-	env repository.Env
+	env repository.ContentEnv
 }
 
 func NewStoryRouter(db *sqlx.DB) StoryRouter {
 	return StoryRouter{
-		env: repository.NewEnv(db),
+		env: repository.NewContentEnv(db),
 	}
 }
 
