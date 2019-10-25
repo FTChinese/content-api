@@ -12,7 +12,7 @@ type galleryResult struct {
 	err     error
 }
 
-func (env Env) RetrieveGalleryImages(id int64) ([]models.GalleryItem, error) {
+func (env ContentEnv) RetrieveGalleryImages(id int64) ([]models.GalleryItem, error) {
 	var items = []models.GalleryItem{}
 
 	if err := env.db.Select(&items, stmtGalleryImages, id); err != nil {
@@ -22,7 +22,7 @@ func (env Env) RetrieveGalleryImages(id int64) ([]models.GalleryItem, error) {
 	return items, nil
 }
 
-func (env Env) RetrieveGalleryBody(id int64) (models.Gallery, error) {
+func (env ContentEnv) RetrieveGalleryBody(id int64) (models.Gallery, error) {
 	var gallery models.Gallery
 
 	if err := env.db.Get(&gallery, stmtGallery, id); err != nil {
@@ -32,7 +32,7 @@ func (env Env) RetrieveGalleryBody(id int64) (models.Gallery, error) {
 	return gallery, nil
 }
 
-func (env Env) RetrieveGallery(id int64) (models.Gallery, error) {
+func (env ContentEnv) RetrieveGallery(id int64) (models.Gallery, error) {
 	imageChan := make(chan imageResult)
 	bodyChan := make(chan galleryResult)
 

@@ -7,16 +7,16 @@ import (
 	"time"
 )
 
-type Env struct {
+type ContentEnv struct {
 	db    *sqlx.DB
 	cache *cache.Cache
 }
 
-func NewEnv(db *sqlx.DB) Env {
-	return Env{
+func NewContentEnv(db *sqlx.DB) ContentEnv {
+	return ContentEnv{
 		db: db,
 		// Default expiration 24 hours, and purges the expired items every hour.
-		cache: cache.New(24*time.Hour, 1*time.Hour),
+		cache: cache.New(5*time.Minute, 10*time.Minute),
 	}
 }
 

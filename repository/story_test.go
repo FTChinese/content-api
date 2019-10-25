@@ -30,7 +30,7 @@ func init() {
 
 func TestEnv_RetrieveRawStory(t *testing.T) {
 
-	env := Env{db: DB}
+	env := ContentEnv{db: DB}
 
 	type args struct {
 		id string
