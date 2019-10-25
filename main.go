@@ -75,11 +75,13 @@ func main() {
 
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
-			"home":         "/channels/home/latest",
-			"home_archive": "/channels/home/archives/{date}",
-			"story":        "/stories/{id}/<cn | en | ce>",
-			"video":        "/videos/{id}",
-			"gallery":      "/galleries/{id}",
+			"home":           "/front_page/latest",
+			"home_archive":   "/front_page/archives/{date}",
+			"channels_index": "/channels",
+			"channel_page":   "/channels/{name}",
+			"story":          "/stories/{id}/<cn | en | ce>",
+			"video":          "/videos/{id}",
+			"gallery":        "/galleries/{id}",
 		}
 
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
