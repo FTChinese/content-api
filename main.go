@@ -73,6 +73,17 @@ func main() {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
 	})
 
+	r.Route("/__status", func(r chi.Router) {
+		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+			var data = map[string]string{
+				"channelIds": "",
+			}
+
+			_ = view.Render(writer, view.NewResponse().SetBody(data))
+		})
+		r.Get("/channel_ids", pageRouter.InspectChannelMap)
+	})
+
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
 			"home":           "/front_page/latest",

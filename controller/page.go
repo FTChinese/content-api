@@ -75,3 +75,13 @@ func (router PageRouter) ChannelData(w http.ResponseWriter, req *http.Request) {
 
 	_ = view.Render(w, view.NewResponse().SetBody(data))
 }
+
+func (router PageRouter) InspectChannelMap(w http.ResponseWriter, req *http.Request) {
+	m, err := router.env.LoadChannelMap()
+	if err != nil {
+		_ = view.Render(w, view.NewDBFailure(err))
+		return
+	}
+
+	_ = view.Render(w, view.NewResponse().SetBody(m))
+}
