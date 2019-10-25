@@ -77,11 +77,11 @@ SELECT id,
 FROM cmstmp01.channel`
 
 const stmtListChannels = stmtChannelItem + `
-WHERE full_path IS NOT NULL
+WHERE key_name IS NOT NULL
     AND is_active = 1
 ORDER BY id`
 
 const stmtChannelSetting = stmtChannelItem + `
-WHERE full_path = ?
+WHERE key_name = ?
     AND is_active = 1
 LIMIT 1`
