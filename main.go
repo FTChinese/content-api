@@ -76,7 +76,7 @@ func main() {
 	r.Route("/__status", func(r chi.Router) {
 		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 			var data = map[string]string{
-				"channelIds": "",
+				"channelIds": "/__status/channel_ids",
 			}
 
 			_ = view.Render(writer, view.NewResponse().SetBody(data))
