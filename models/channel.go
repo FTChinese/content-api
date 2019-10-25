@@ -36,7 +36,7 @@ type ArchivedFrontPage struct {
 type ChannelSetting struct {
 	ID          int64       `json:"id" db:"id"`
 	ParentID    int64       `json:"parentId" db:"parent_id"`
-	FullPath    string      `json:"fullPath" db:"full_path"`
+	KeyName     string      `json:"keyName" db:"key_name"`
 	Name        string      `json:"name"`
 	Title       string      `json:"title" db:"title"`
 	Description null.String `json:"description" db:"description"`

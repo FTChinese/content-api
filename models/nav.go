@@ -7,7 +7,7 @@ func NewChannelMap(data []ChannelSetting) ChannelMap {
 	var m = make(ChannelMap)
 
 	for _, v := range data {
-		m[v.FullPath] = v.ID
+		m[v.KeyName] = v.ID
 	}
 
 	return m

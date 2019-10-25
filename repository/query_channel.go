@@ -69,7 +69,7 @@ AND FROM_UNIXTIME(story.pubdate, "%Y-%m-%d") = ?`)
 const stmtChannelItem = `
 SELECT id,
     parent_id,
-    full_path,
+    key_name,
     title,
     description,
     created_utc,
@@ -78,8 +78,10 @@ FROM cmstmp01.channel`
 
 const stmtListChannels = stmtChannelItem + `
 WHERE full_path IS NOT NULL
+    AND is_active = 1
 ORDER BY id`
 
 const stmtChannelSetting = stmtChannelItem + `
 WHERE full_path = ?
+    AND is_active = 1
 LIMIT 1`
