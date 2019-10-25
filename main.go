@@ -60,7 +60,7 @@ func main() {
 	storyRouter := controller.NewStoryRouter(db)
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
-	channelRouter := controller.NewChannelRouter(db)
+	pageRouter := controller.NewPageRouter(db)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -85,11 +85,15 @@ func main() {
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
 	})
 
+	r.Route("/front_page", func(r chi.Router) {
+		r.Get("/latest", pageRouter.TodayFrontPage)
+		r.Get("/archives/{date}", pageRouter.ArchivedFrontPage)
+	})
+
+	// GET /channels/{pathName}?page=<int>&per_page=<int>
 	r.Route("/channels", func(r chi.Router) {
-		r.Route("/home", func(r chi.Router) {
-			r.Get("/latest", channelRouter.TodayFrontPage)
-			r.Get("/archives/{date}", channelRouter.ArchivedFrontPage)
-		})
+		r.Get("/", pageRouter.ChannelList)
+		r.Get("/{name}", pageRouter.ChannelData)
 	})
 
 	r.Route("/stories/{id}", func(r chi.Router) {
