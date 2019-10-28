@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"github.com/FTChinese/go-rest"
 	"gitlab.com/ftchinese/content-api/models"
+	"reflect"
 	"testing"
 )
 
@@ -47,6 +49,37 @@ func TestChannelEnv_retrieveChannel(t *testing.T) {
 			}
 
 			t.Logf("A channel: %+v", got)
+		})
+	}
+}
+
+func TestChannelEnv_RetrieveTeasers(t *testing.T) {
+
+	env := NewChannelEnv(DB)
+
+	type args struct {
+		channelID int64
+		p         gorest.Pagination
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []models.Teaser
+		wantErr bool
+	}{
+		{},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := env.RetrieveTeasers(tt.args.channelID, tt.args.p)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RetrieveTeasers() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RetrieveTeasers() got = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }
