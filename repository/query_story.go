@@ -23,11 +23,9 @@ const stmtStory = `
 		story.cbody AS body_cn,
         story.ebody AS body_en
 	FROM cmstmp01.story AS story
-		LEFT JOIN (
-			cmstmp01.story_pic AS storyToPic
-			INNER JOIN cmstmp01.picture AS picture
-		)
-		ON story.id = storyToPic.storyid 
-		AND picture.id = storyToPic.picture_id
+		LEFT JOIN cmstmp01.story_pic AS storyToPic
+            ON story.id = storyToPic.storyid 
+        LEFT JOIN cmstmp01.picture AS picture
+		    ON picture.id = storyToPic.picture_id
 	WHERE story.id = ?
 		AND story.publish_status = 'publish'`
