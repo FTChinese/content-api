@@ -14,8 +14,7 @@ type ContentEnv struct {
 
 func NewContentEnv(db *sqlx.DB) ContentEnv {
 	return ContentEnv{
-		db: db,
-		// Default expiration 24 hours, and purges the expired items every hour.
+		db:    db,
 		cache: cache.New(5*time.Minute, 10*time.Minute),
 	}
 }
