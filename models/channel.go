@@ -3,23 +3,7 @@ package models
 import (
 	"github.com/FTChinese/go-rest/chrono"
 	"github.com/guregu/null"
-	"strings"
 )
-
-type Teaser struct {
-	ID         string      `json:"id" db:"id"`
-	Tag        string      `json:"-"` // Only used as db scan target.
-	Tags       []string    `json:"tags"`
-	Title      string      `json:"title" db:"title"`
-	Standfirst string      `json:"standfirst" db:"standfirst"`
-	CoverURL   string      `json:"coverUrl" db:"cover_url"`
-	CreatedAt  chrono.Time `json:"createdAt" db:"created_utc"`
-	UpdatedAt  chrono.Time `json:"updatedAt" db:"updated_utc"`
-}
-
-func (t *Teaser) Normalize() {
-	t.Tags = strings.Split(t.Tag, ",")
-}
 
 type FrontPage struct {
 	Date chrono.Date `json:"date"`
@@ -36,10 +20,11 @@ type ArchivedFrontPage struct {
 type ChannelSetting struct {
 	ID          int64       `json:"id" db:"id"`
 	ParentID    int64       `json:"parentId" db:"parent_id"`
-	KeyName     string      `json:"keyName" db:"key_name"`
-	Name        string      `json:"name"`
+	KeyName     string      `json:"keyName" db:"key_name"` // Human-readable string to represent and search this row.
+	Name        string      `json:"name"`                  // The last segment of KeyName
 	Title       string      `json:"title" db:"title"`
 	Description null.String `json:"description" db:"description"`
+	KeyWords    null.String `json:"-" db:"key_words"` // Comma-separated tags to find all articles under this channel.
 	CreatedAt   chrono.Time `json:"createdAt" db:"created_utc"`
 	UpdatedAt   chrono.Time `json:"updatedAt" db:"updated_utc"`
 }
