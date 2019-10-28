@@ -5,12 +5,12 @@ import "fmt"
 const (
 	stmtStoryTeaser = `
     SELECT story.id AS id,
+        FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
+		FROM_UNIXTIME(story.last_publish_time) AS updated_utc,
         story.tag AS tag,
         story.cheadline AS title,
         story.clongleadbody AS standfirst,
-        picture.piclink  AS cover_url,
-        FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
-		FROM_UNIXTIME(story.last_publish_time) AS updated_utc`
+        picture.piclink  AS cover_url`
 
 	stmtChannelContent = stmtStoryTeaser + `
     FROM cmstmp01.channel_detail AS ch_story
