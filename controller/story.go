@@ -47,7 +47,7 @@ func (router StoryRouter) CN(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_ = view.Render(w, view.NewResponse().SetBody(models.NewStoryCN(rawStory)))
+	_ = view.Render(w, view.NewResponse().SetBody(models.NewStoryCN(&rawStory)))
 }
 
 func (router StoryRouter) EN(w http.ResponseWriter, req *http.Request) {
@@ -63,7 +63,7 @@ func (router StoryRouter) EN(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s, err := models.NewStoryEN(rawStory)
+	s, err := models.NewStoryEN(&rawStory)
 	if err != nil {
 		_ = view.Render(w, view.NewNotFound())
 		return
@@ -85,7 +85,7 @@ func (router StoryRouter) Bilingual(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s, err := models.NewBilingualStory(rawStory)
+	s, err := models.NewBilingualStory(&rawStory)
 	if err != nil {
 		_ = view.Render(w, view.NewNotFound())
 		return
