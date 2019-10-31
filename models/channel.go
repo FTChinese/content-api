@@ -25,6 +25,7 @@ type ChannelSetting struct {
 	Title       string      `json:"title" db:"title"`
 	Description null.String `json:"description" db:"description"`
 	KeyWords    null.String `json:"-" db:"key_words"` // Comma-separated tags to find all articles under this channel.
+	ContentKind ContentKind `json:"-"`
 	CreatedAt   chrono.Time `json:"createdAt" db:"created_utc"`
 	UpdatedAt   chrono.Time `json:"updatedAt" db:"updated_utc"`
 }
@@ -34,4 +35,9 @@ type ChannelSetting struct {
 type ChannelPage struct {
 	ChannelSetting
 	Data []Teaser `json:"data"`
+}
+
+type InteractivePage struct {
+	ChannelSetting
+	Data []InteractiveTeaser `json:"data"`
 }
