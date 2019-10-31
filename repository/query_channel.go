@@ -1,56 +1,5 @@
 package repository
 
-import "fmt"
-
-const (
-	stmtStoryTeaser = `
-    SELECT story.id AS id,
-        FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
-		FROM_UNIXTIME(story.last_publish_time) AS updated_utc,
-        story.tag AS tag,
-        story.cheadline AS title,
-        story.clongleadbody AS standfirst,
-        picture.piclink  AS cover_url`
-
-	stmtChannelContent = stmtStoryTeaser + `
-    FROM cmstmp01.channel_detail AS ch_story
-        LEFT JOIN cmstmp01.story 
-            ON ch_story.id = story.id
-        LEFT JOIN cmstmp01.story_pic
-            ON story.id = story_pic.storyid
-        LEFT JOIN cmstmp01.picture AS picture
-            ON story_pic.picture_id = picture.id
-    WHERE ch_story.chaid = ?
-        AND story.publish_status = 'publish'
-    ORDER BY ch_story.addtime DESC
-	LIMIT ? OFFSET ?`
-
-	stmtFrontPage = stmtStoryTeaser + `
-    FROM cmstmp01.story
-        LEFT JOIN cmstmp01.story_pic
-            ON story.id = story_pic.storyid 
-        LEFT JOIN cmstmp01.picture AS picture
-            ON picture.id = story_pic.picture_id
-    WHERE story.publish_status = 'publish'
-        %s
-    ORDER BY story.priority,
-        story.fileupdatetime`
-)
-
-// Current front page.
-var stmtFrontPageToday = fmt.Sprintf(stmtFrontPage, `
-AND story.pubdate = (
-    SELECT pubdate
-    FROM cmstmp01.story
-    WHERE publish_status = 'publish'
-    ORDER BY pubdate DESC
-    LIMIT 1
-)`)
-
-// The front page on a certain date.
-var stmtFrontPageArchive = fmt.Sprintf(stmtFrontPage, `
-AND FROM_UNIXTIME(story.pubdate, "%Y-%m-%d") = ?`)
-
 //const stmtNav = `
 //    SELECT top.id AS id,
 //      top.code AS name,
