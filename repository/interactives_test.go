@@ -28,9 +28,9 @@ func TestInteractiveEnv_RetrieveChannelTeasers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := env.RetrieveChannelTeasers(tt.args.keyWords, tt.args.p)
+			got, err := env.RetrieveTeasers(tt.args.keyWords, tt.args.p)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveChannelTeasers() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RetrieveTeasers() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -39,71 +39,7 @@ func TestInteractiveEnv_RetrieveChannelTeasers(t *testing.T) {
 	}
 }
 
-func TestInteractiveEnv_RetrieveAudioArticle(t *testing.T) {
-	env := NewInteractiveEnv(DB)
-	type args struct {
-		id int64
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Retrieve article for audio",
-			args: args{
-				id: 14168,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			got, err := env.RetrieveAudioArticle(tt.args.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveAudioArticle() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			t.Logf("%+v", got)
-		})
-	}
-}
-
-func TestInteractiveEnv_RetrieveSpeedReadingTeasers(t *testing.T) {
-	env := NewInteractiveEnv(DB)
-
-	type args struct {
-		p gorest.Pagination
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Retrieve speed reading teasers",
-			args: args{
-				p: gorest.NewPagination(1, 12),
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			got, err := env.RetrieveSpeedReadingTeasers(tt.args.p)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveSpeedReadingTeasers() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			t.Logf("Speed reading teasers: %+v", got)
-		})
-	}
-}
-
-func TestInteractiveEnv_RetrieveSpeedReading(t *testing.T) {
+func TestInteractiveEnv_RetrieveRawContent(t *testing.T) {
 	env := NewInteractiveEnv(DB)
 
 	type args struct {
@@ -115,20 +51,55 @@ func TestInteractiveEnv_RetrieveSpeedReading(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Article for speed ing reading",
-			args:    args{id: 14156},
+			name:    "FTA Report",
+			args:    args{id: 14065},
+			wantErr: false,
+		},
+		{
+			name:    "Speed Reading",
+			args:    args{id: 14058},
+			wantErr: false,
+		},
+		{
+			name:    "FT Radio",
+			args:    args{id: 14172},
+			wantErr: false,
+		},
+		{
+			name:    "MLE",
+			args:    args{id: 14168},
+			wantErr: false,
+		},
+		{
+			name:    "Daily Word",
+			args:    args{id: 14162},
+			wantErr: false,
+		},
+		{
+			name:    "Book",
+			args:    args{id: 14148},
+			wantErr: false,
+		},
+		{
+			name:    "Boomear",
+			args:    args{id: 14116},
+			wantErr: false,
+		},
+		{
+			name:    "Life of a song",
+			args:    args{id: 7825},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := env.RetrieveSpeedReading(tt.args.id)
+
+			_, err := env.RetrieveRawContent(tt.args.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveSpeedReading() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RetrieveRawContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
-			t.Logf("An article for speed reading: %+v", got)
 		})
 	}
 }

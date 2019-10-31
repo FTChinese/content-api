@@ -19,6 +19,7 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Title:       "麦可林学英语",
 		Description: null.String{},
 		KeyWords:    null.StringFrom("麦可林学英语"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
@@ -29,7 +30,8 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Name:        "life-of-a-song",
 		Title:       "音乐之生",
 		Description: null.String{},
-		KeyWords:    null.StringFrom("英语电台,音乐"),
+		KeyWords:    null.StringFrom("音乐"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
@@ -41,6 +43,7 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Title:       "BoomEar艺术播客",
 		Description: null.String{},
 		KeyWords:    null.StringFrom("BoomEar艺术播客"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
@@ -52,20 +55,10 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Title:       "一波好书",
 		Description: null.String{},
 		KeyWords:    null.StringFrom("一波好书"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
-	//"english_bilingual-reading": {
-	//    ID:          0,
-	//    ParentID:    0,
-	//    KeyName:     "english_bilingual-reading",
-	//    Name:        "bilingual-reading",
-	//    Title:       "双语阅读",
-	//    Description: null.String{},
-	//    KeyWords:    null.String{},
-	//    CreatedAt:   chrono.Time{},
-	//    UpdatedAt:   chrono.Time{},
-	//},
 	"ft-radio": {
 		ID:          0,
 		ParentID:    0,
@@ -74,20 +67,22 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Title:       "英语电台",
 		Description: null.String{},
 		KeyWords:    null.StringFrom("英语电台"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
-	//"english_speed-reading": {
-	//    ID:          0,
-	//    ParentID:    0,
-	//    KeyName:     "english_speed-reading",
-	//    Name:        "speed-reading",
-	//    Title:       "FT英语速读",
-	//    Description: null.String{},
-	//    KeyWords:    null.StringFrom("速读"),
-	//    CreatedAt:   chrono.Time{},
-	//    UpdatedAt:   chrono.Time{},
-	//},
+	"speed-reading": {
+		ID:          0,
+		ParentID:    0,
+		KeyName:     "speed-reading",
+		Name:        "speed-reading",
+		Title:       "FT英语速读",
+		Description: null.String{},
+		KeyWords:    null.StringFrom("速读"),
+		ContentKind: models.ContentKindSpeedReading,
+		CreatedAt:   chrono.Time{},
+		UpdatedAt:   chrono.Time{},
+	},
 	"daily-word": {
 		ID:          0,
 		ParentID:    0,
@@ -96,21 +91,10 @@ var interactiveMap = map[string]models.ChannelSetting{
 		Title:       "每日一词",
 		Description: null.String{},
 		KeyWords:    null.StringFrom("每日一词"),
+		ContentKind: models.ContentKindAudio,
 		CreatedAt:   chrono.Time{},
 		UpdatedAt:   chrono.Time{},
 	},
-}
-
-var SpeedReadingChannel = models.ChannelSetting{
-	ID:          0,
-	ParentID:    0,
-	KeyName:     "speed-reading",
-	Name:        "speed-reading",
-	Title:       "FT英语速读",
-	Description: null.String{},
-	KeyWords:    null.StringFrom("速读"),
-	CreatedAt:   chrono.Time{},
-	UpdatedAt:   chrono.Time{},
 }
 
 func GetAudioChannelConfig(name string) (models.ChannelSetting, bool) {
@@ -130,11 +114,11 @@ func NewInteractiveEnv(db *sqlx.DB) InteractiveEnv {
 	}
 }
 
-// RetrieveChannelTeasers loads the channel article list.
-func (env InteractiveEnv) RetrieveChannelTeasers(keyWords string, p gorest.Pagination) ([]models.Teaser, error) {
-	var teasers = make([]models.Teaser, 0)
+// RetrieveTeasers loads a list article summary.
+func (env InteractiveEnv) RetrieveTeasers(keyWords string, p gorest.Pagination) ([]models.RawInteractive, error) {
+	var teasers = make([]models.RawInteractive, 0)
 
-	err := env.db.Select(&teasers, stmtAudioTeasers,
+	err := env.db.Select(&teasers, stmtInteractiveTeaser,
 		keyWords,
 		p.Limit,
 		p.Offset(),
@@ -144,54 +128,15 @@ func (env InteractiveEnv) RetrieveChannelTeasers(keyWords string, p gorest.Pagin
 		return teasers, err
 	}
 
-	for i := range teasers {
-		teasers[i].Normalize()
-	}
-
 	return teasers, nil
 }
 
-// RetrieveAudioArticle loads article of interactive.
-func (env InteractiveEnv) RetrieveAudioArticle(id int64) (models.AudioArticle, error) {
-	var a models.AudioArticle
+func (env InteractiveEnv) RetrieveRawContent(id int64) (models.RawInteractive, error) {
+	var c models.RawInteractive
 
-	if err := env.db.Get(&a, stmtAudioArticle, id); err != nil {
-		return a, err
+	if err := env.db.Get(&c, stmtInteractiveContent, id); err != nil {
+		return c, err
 	}
 
-	a.Normalize()
-
-	return a, nil
-}
-
-func (env InteractiveEnv) RetrieveSpeedReadingTeasers(p gorest.Pagination) ([]models.Teaser, error) {
-	var teasers = make([]models.Teaser, 0)
-
-	err := env.db.Select(&teasers,
-		stmtSpeedReadingTeasers,
-		p.Limit,
-		p.Offset(),
-	)
-
-	if err != nil {
-		return teasers, err
-	}
-
-	for i, _ := range teasers {
-		teasers[i].Normalize()
-	}
-
-	return teasers, nil
-}
-
-func (env InteractiveEnv) RetrieveSpeedReading(id int64) (models.SpeedReading, error) {
-	var s models.SpeedReading
-
-	if err := env.db.Get(&s, stmtSpeedReadingContent, id); err != nil {
-		return s, err
-	}
-
-	s.Normalize()
-
-	return s, nil
+	return c, nil
 }
