@@ -28,40 +28,35 @@ func NewChannelEnv(db *sqlx.DB) ChannelEnv {
 }
 
 func (env ChannelEnv) TodayFrontPage() (models.FrontPage, error) {
-	var teasers = []models.Teaser{}
+	var stories = make([]models.RawStory, 0)
 
-	if err := env.db.Select(&teasers, stmtFrontPageToday); err != nil {
+	if err := env.db.Select(&stories, stmtFrontPageToday); err != nil {
 		return models.FrontPage{}, err
 	}
 
-	if len(teasers) > 0 {
-		for _, item := range teasers {
-			item.Normalize()
-		}
+	var teasers = make([]models.Teaser, 0)
 
-		return models.FrontPage{
-			Date: chrono.DateFrom(teasers[0].CreatedAt.Time),
-			Data: teasers,
-		}, nil
+	for _, item := range stories {
+		teasers = append(teasers, item.Teaser())
 	}
 
 	return models.FrontPage{
-		Date: chrono.Date{},
+		Date: chrono.DateFrom(stories[0].CreatedAt.Time),
 		Data: teasers,
 	}, nil
 }
 
 func (env ChannelEnv) ArchivedFrontPage(date string) (models.ArchivedFrontPage, error) {
-	var teasers = []models.Teaser{}
+	var stories = make([]models.RawStory, 0)
 
-	if err := env.db.Select(&teasers, stmtFrontPageArchive, date); err != nil {
+	if err := env.db.Select(&stories, stmtFrontPageArchive, date); err != nil {
 		return models.ArchivedFrontPage{}, err
 	}
 
-	if len(teasers) > 0 {
-		for _, item := range teasers {
-			item.Normalize()
-		}
+	var teasers = make([]models.Teaser, 0)
+
+	for _, item := range stories {
+		teasers = append(teasers, item.Teaser())
 	}
 
 	return models.ArchivedFrontPage{
@@ -181,7 +176,7 @@ type teasersResult struct {
 func (env ChannelEnv) RetrieveTeasers(channelID int64, p gorest.Pagination) ([]models.Teaser, error) {
 	var t = make([]models.Teaser, 0)
 
-	err := env.db.Select(&t, stmtChannelContent,
+	err := env.db.Select(&t, stmtStoryTeaser,
 		channelID, p.Limit, p.Offset(),
 	)
 	if err != nil {
