@@ -5,7 +5,7 @@ import "testing"
 func TestByline_String(t *testing.T) {
 	bl := Byline{
 		Organization: "英国《金融时报》",
-		Authors: []Author{
+		Authors: []Authors{
 			{
 				Names: []string{"詹姆斯•波利提"},
 				Place: "华盛顿",
