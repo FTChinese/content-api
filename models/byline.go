@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+type Authors struct {
+	Names []string `json:"names"`
+	Place string   `json:"place"`
+}
+
 // Byline aggregates byline data
 // {
 //  "organization": "英国《金融时报》",
@@ -20,8 +25,8 @@ import (
 //  ]
 // }
 type Byline struct {
-	Organization string   `json:"organization"`
-	Authors      []Author `json:"authors"`
+	Organization string    `json:"organization"`
+	Authors      []Authors `json:"authors"`
 }
 
 func (b Byline) String() string {
@@ -31,9 +36,4 @@ func (b Byline) String() string {
 	}
 
 	return fmt.Sprintf("%s %s", b.Organization, strings.Join(authors, ", "))
-}
-
-type Author struct {
-	Names []string `json:"name"`
-	Place string   `json:"place"`
 }
