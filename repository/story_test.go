@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
+	"gitlab.com/ftchinese/content-api/models"
 	"testing"
 )
 
@@ -54,7 +55,16 @@ func TestEnv_RetrieveRawStory(t *testing.T) {
 				return
 			}
 
-			t.Logf("%+v", got)
+			t.Logf("Raw story: %+v\n", got)
+
+			t.Logf("CN story: %+v", models.NewStoryCN(&got))
+
+			storyEN, err := models.NewStoryEN(&got)
+			if err != nil {
+				t.Error(err)
+			}
+
+			t.Logf("EN story: %+v", storyEN)
 		})
 	}
 }
