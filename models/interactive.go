@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/guregu/null"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 type AudioTimeline struct {
@@ -12,66 +11,101 @@ type AudioTimeline struct {
 	Text  string     `json:"text"`
 }
 
-// 英语电台,FT Arts,音乐,音乐之生,interactive_search
-// Standfirst - clongleadbody
-// BodyJSON - cbody
-// BodyXML - ebody
-type AudioArticle struct {
-	Teaser
-	AudioURL    null.String       `json:"audioUrl" db:"audio_url"`
-	Byline      null.String       `json:"byline" db:"byline"`
-	RawBodyJSON string            `json:"-" db:"raw_body_json"`
-	Body        [][]AudioTimeline `json:"body"`
-	RawBodyXML  string            `json:"-" db:"raw_body_xml"`
-	BodyXML     []string          `json:"bodyXml"`
-}
-
-func (a *AudioArticle) Normalize() {
-	a.Teaser.Normalize()
-
-	a.BodyXML = strings.Split(a.RawBodyXML, "\n")
-
-	result := gjson.Get(a.RawBodyJSON, "text")
-
-	if result.Exists() {
-		_ = json.Unmarshal([]byte(result.String()), &a.Body)
-	}
-}
-
 type Word struct {
 	Term        string `json:"term"`
 	Description string `json:"description"`
 }
 
-type SpeedReading struct {
-	Teaser
-	RawVocab     string `json:"-" db:"raw_vocab"`
-	Vocabularies []Word `json:"vocabularies"`
-	TitleEN      string `json:"titleEn" db:"title_en"`
-	Body         string `json:"body" db:"raw_body"`
-	Quiz         string `json:"quiz" db:"quiz"`
+type AlternativeTitles struct {
+	English   null.String `json:"english"`
+	Promotion null.String `json:"promotion"`
 }
 
-func (s *SpeedReading) Normalize() {
-	s.Teaser.Normalize()
+type Interactive struct {
+	InteractiveTeaser
+	Type              ContentKind       `json:"type"`
+	Byline            null.String       `json:"byline"`
+	BodyXML           string            `json:"bodyXml"`
+	AlternativeTitles AlternativeTitles `json:"alternativeTitles"`
+	Timeline          [][]AudioTimeline `json:"timeline"` // For those with audio and subtitles
+	Vocabularies      []Word            `json:"vocabularies"`
+	Quiz              null.String       `json:"quiz"` // For Speed reading.
+}
 
-	entries := strings.Split(s.RawVocab, "\n")
+// NewPlainInteractive is used to build data for:
+// 企业公告,interactive_search,2019吴晓波青年午餐会,去广告
+// FT研究院,报告,置顶,去广告,会员专享,interactive_search
+// 一周新闻,教程,入门级
+func NewPlainInteractive(raw *RawInteractive) Interactive {
+	return Interactive{
+		InteractiveTeaser: InteractiveTeaser{
+			ArticleMeta: raw.ArticleMeta(),
+			TeaserBase: TeaserBase{
+				Title:      raw.TitleCN,
+				Standfirst: raw.LongLeadCN,
+				CoverURL:   raw.CoverURL,
+			},
+			AudioURL: null.String{},
+		},
+		Byline:  null.NewString(raw.BylineCN, raw.BylineCN != ""),
+		BodyXML: raw.BodyCN,
+	}
+}
 
-	for _, entry := range entries {
-		var word Word
-		w := strings.Split(entry, "|")
-		if len(w) > 1 {
-			word = Word{
-				Term:        strings.TrimSpace(w[0]),
-				Description: strings.TrimSpace(w[1]),
-			}
-		} else {
-			word = Word{
-				Term:        strings.TrimSpace(entry),
-				Description: "",
-			}
+// NewAudioArticle is used to build contents for:
+// 一波好书,音频,会员专享
+// 每日一词,音频,会员专享
+// 麦可林学英语,音频,会员专享,interactive_search,英语电台
+// 英语电台,interactive_search,
+// 英语电台,FT Arts,音乐,音乐之生,interactive_search
+// BoomEar艺术播客,音频
+func NewAudioArticle(raw *RawInteractive) Interactive {
+
+	var timeline [][]AudioTimeline
+	if len(raw.BodyCN) > 0 {
+		var result = gjson.Get(raw.BodyCN, "text")
+		if result.Exists() {
+			_ = json.Unmarshal([]byte(result.String()), &timeline)
 		}
+	}
 
-		s.Vocabularies = append(s.Vocabularies, word)
+	return Interactive{
+		InteractiveTeaser: InteractiveTeaser{
+			ArticleMeta: raw.ArticleMeta(),
+			TeaserBase: TeaserBase{
+				Title:      raw.TitleCN,
+				Standfirst: raw.LongLeadCN,
+				CoverURL:   raw.CoverURL,
+			},
+			AudioURL: null.NewString(raw.ShortLeadCN, raw.ShortLeadCN != ""),
+		},
+		Byline:            null.NewString(raw.BylineCN, raw.BylineCN != ""),
+		BodyXML:           raw.BodyEN,
+		AlternativeTitles: AlternativeTitles{},
+		Timeline:          timeline,
+		Quiz:              null.String{},
+	}
+}
+
+// NewSpeedReading is used to build data for:
+// 速读,interactive_search,
+func NewSpeedReading(raw *RawInteractive) Interactive {
+	return Interactive{
+		InteractiveTeaser: InteractiveTeaser{
+			ArticleMeta: raw.ArticleMeta(),
+			TeaserBase: TeaserBase{
+				Title:      raw.TitleCN,
+				Standfirst: raw.ShortLeadCN,
+				CoverURL:   raw.CoverURL,
+			},
+		},
+		Byline:  null.String{},
+		BodyXML: raw.BodyEN,
+		AlternativeTitles: AlternativeTitles{
+			English: raw.TitleEN,
+		},
+		Timeline:     nil,
+		Vocabularies: raw.Vocabularies(),
+		Quiz:         null.StringFrom(raw.BodyCN),
 	}
 }
