@@ -61,7 +61,7 @@ func main() {
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
 	pageRouter := controller.NewPageRouter(db)
-	audioRouter := controller.NewAudioRouter(db)
+	interactiveRouter := controller.NewAudioRouter(db)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -87,23 +87,21 @@ func main() {
 
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
-			"home":                  "/front_page/latest",
-			"home_archive":          "/front_page/archives/{date}",
-			"channels_index":        "/channels",
-			"channel_page":          "/channels/{name}",
-			"story":                 "/stories/{id}/<cn | en | ce>",
-			"video":                 "/videos/{id}",
-			"gallery":               "/galleries/{id}",
-			"audio_channels":        "/audio/channels/{name}",
-			"audio_contents":        "/audio/contents/{id}",
-			"speed-reading_channel": "/speed-reading",
-			"speed-reading_content": "/speed-reading/{id}",
+			"home":                 "/front-page/latest",
+			"home_archive":         "/front-page/archives/{date}",
+			"channels_index":       "/channels",
+			"channel_page":         "/channels/{name}",
+			"story":                "/stories/{id}/<cn | en | ce>",
+			"video":                "/videos/{id}",
+			"gallery":              "/galleries/{id}",
+			"interactive_channels": "/interactive/channels/{name}",
+			"interactive_contents": "/interactive/contents/{id}",
 		}
 
 		_ = view.Render(writer, view.NewResponse().SetBody(data))
 	})
 
-	r.Route("/front_page", func(r chi.Router) {
+	r.Route("/front-page", func(r chi.Router) {
 		r.Get("/latest", pageRouter.TodayFrontPage)
 		r.Get("/archives/{date}", pageRouter.ArchivedFrontPage)
 	})
@@ -114,14 +112,9 @@ func main() {
 		r.Get("/{name}", pageRouter.ChannelData)
 	})
 
-	r.Route("/audio", func(r chi.Router) {
-		r.Get("/channels/{name}", audioRouter.ChannelPage)
-		r.Get("/contents/{id}", audioRouter.Content)
-	})
-
-	r.Route("/speed-reading", func(r chi.Router) {
-		r.Get("/", audioRouter.SpeedReadingChannel)
-		r.Get("/{id}", audioRouter.SpeedReadingArticle)
+	r.Route("/interactive", func(r chi.Router) {
+		r.Get("/channels/{name}", interactiveRouter.ChannelPage)
+		r.Get("/contents/{id}", interactiveRouter.Content)
 	})
 
 	r.Route("/stories/{id}", func(r chi.Router) {
