@@ -6,32 +6,30 @@ import (
 )
 
 type BilingualStory struct {
-	StoryMeta
+	ArticleMeta
 	Title      Bilingual   `json:"title"`
 	Standfirst string      `json:"standfirst"`
-	CoverURL   string      `json:"coverUrl"`
-	BylineCN   Byline      `json:"bylineCn"`
-	BylineEN   Byline      `json:"bylineEn"`
+	CoverURL   null.String `json:"coverUrl"`
+	StoryBase
 	Body       []Bilingual `json:"body"`
 	Translator null.String `json:"translator"`
 }
 
-func NewBilingualStory(raw RawStory) (BilingualStory, error) {
+func NewBilingualStory(raw *RawStory) (BilingualStory, error) {
 
 	if !raw.Bilingual {
 		return BilingualStory{}, errors.New("not found")
 	}
 
 	s := BilingualStory{
-		StoryMeta: raw.MetaData(),
+		ArticleMeta: raw.ArticleMeta(),
 		Title: Bilingual{
 			CN: raw.TitleCN,
 			EN: raw.TitleEN,
 		},
-		Standfirst: raw.Standfirst,
+		Standfirst: raw.LongLeadCN,
 		CoverURL:   raw.CoverURL,
-		BylineCN:   raw.BylineCN(),
-		BylineEN:   raw.BylineEN(),
+		StoryBase:  raw.StoryBase(),
 		Body:       []Bilingual{},
 		Translator: null.String{},
 	}
