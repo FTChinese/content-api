@@ -68,3 +68,34 @@ func TestEnv_RetrieveRawStory(t *testing.T) {
 		})
 	}
 }
+
+func TestContentEnv_RelatedStories(t *testing.T) {
+	env := NewContentEnv(DB)
+
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "Retrieve related stories",
+			args:    args{id: "001076306"},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := env.RelatedStories(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RelatedStories() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			t.Logf("Related stories: %+v", got)
+		})
+	}
+}
