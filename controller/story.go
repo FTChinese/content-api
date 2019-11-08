@@ -25,7 +25,7 @@ func (router StoryRouter) Raw(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	story, err := router.env.RetrieveRawStory(id)
+	story, err := router.env.RawStory(id)
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
 		return
@@ -41,7 +41,7 @@ func (router StoryRouter) CN(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rawStory, err := router.env.RetrieveRawStory(id)
+	rawStory, err := router.env.RawStory(id)
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
 		return
@@ -57,7 +57,7 @@ func (router StoryRouter) EN(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rawStory, err := router.env.RetrieveRawStory(id)
+	rawStory, err := router.env.RawStory(id)
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
 		return
@@ -79,17 +79,13 @@ func (router StoryRouter) Bilingual(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rawStory, err := router.env.RetrieveRawStory(id)
+	rawStory, err := router.env.RawStory(id)
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
 		return
 	}
 
-	s, err := models.NewBilingualStory(&rawStory)
-	if err != nil {
-		_ = view.Render(w, view.NewNotFound())
-		return
-	}
+	s := models.NewBilingualStory(&rawStory)
 
 	_ = view.Render(w, view.NewResponse().SetBody(s))
 }

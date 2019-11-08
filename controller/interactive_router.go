@@ -49,7 +49,7 @@ func (router InteractiveRouter) ChannelPage(w http.ResponseWriter, req *http.Req
 	if config.ContentKind == models.ContentKindSpeedReading {
 
 		for _, v := range teasers {
-			data = append(data, v.SpeedReadingTeaser())
+			data = append(data, v.NonAudioTeaser())
 		}
 	} else {
 		for _, v := range teasers {
