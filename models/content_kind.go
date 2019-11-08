@@ -3,14 +3,14 @@ package models
 type ContentKind int
 
 const (
-	ContentKindStory ContentKind = iota
-	ContentKindVideo
-	ContentKindGallery
-	ContentKindAudio
-	ContentKindArticle
-	ContentKindSpeedReading
-	ContentKindReport
-	ContentKindSponsor
+	ContentKindStory        ContentKind = iota // New report
+	ContentKindVideo                           // Video
+	ContentKindGallery                         // Photo gallery
+	ContentKindAudio                           // Interactive audio
+	ContentKindArticle                         // interactive plain article
+	ContentKindSpeedReading                    // interactive speed reading
+	ContentKindReport                          // Interactive fta report
+	ContentKindSponsor                         // Interactive sponsor
 )
 
 func (k ContentKind) String() string {
