@@ -3,15 +3,16 @@ package repository
 const (
 	stmtVideo = `
     SELECT id AS id,
+        fileupdatetime AS created_at,
+		pubdate AS updated_at,
+        accessright AS access_right,
 		cheadline AS title,
 		clongleadbody AS standfirst,
-		TRIM(CONCAT(cdescribe, ' ', cbyline)) AS byline,
-		cc_vaddress AS ccId,
-		cc_piclink AS posterUrl,
-		fileupdatetime AS createdAt,
-		pubdate AS updatedAt
+        cc_piclink AS poster_url,
+		cc_vaddress AS cc_id,
+		TRIM(CONCAT(cdescribe, ' ', cbyline)) AS byline
 	FROM cmstmp01.video_story
-	WHERE id = ? 
+	WHERE id = ?
 		AND publish_status = 'publish'`
 
 	stmtGalleryImages = `
