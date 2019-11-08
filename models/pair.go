@@ -5,9 +5,9 @@ type StringPair struct {
 	Second string
 }
 
-// AlignStringPairs match the elements of two arrays
+// ZipString match the elements of two arrays
 // on the same index into a StringPair
-func AlignStringPairs(a, b []string) []StringPair {
+func ZipString(a, b []string) []StringPair {
 	var pairs []StringPair
 
 	var aIndex, bIndex int
