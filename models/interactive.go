@@ -23,7 +23,6 @@ type AlternativeTitles struct {
 
 type Interactive struct {
 	InteractiveTeaser
-	Type              ContentKind       `json:"type"`
 	Byline            null.String       `json:"byline"`
 	BodyXML           string            `json:"bodyXml"`
 	AlternativeTitles AlternativeTitles `json:"alternativeTitles"`
@@ -38,17 +37,9 @@ type Interactive struct {
 // 一周新闻,教程,入门级
 func NewPlainInteractive(raw *RawInteractive) Interactive {
 	return Interactive{
-		InteractiveTeaser: InteractiveTeaser{
-			ArticleMeta: raw.ArticleMeta(),
-			TeaserBase: TeaserBase{
-				Title:      raw.TitleCN,
-				Standfirst: raw.LongLeadCN,
-				CoverURL:   raw.CoverURL,
-			},
-			AudioURL: null.String{},
-		},
-		Byline:  null.NewString(raw.BylineCN, raw.BylineCN != ""),
-		BodyXML: raw.BodyCN,
+		InteractiveTeaser: raw.NonAudioTeaser(),
+		Byline:            null.NewString(raw.BylineCN, raw.BylineCN != ""),
+		BodyXML:           raw.BodyCN,
 	}
 }
 
@@ -70,15 +61,7 @@ func NewAudioArticle(raw *RawInteractive) Interactive {
 	}
 
 	return Interactive{
-		InteractiveTeaser: InteractiveTeaser{
-			ArticleMeta: raw.ArticleMeta(),
-			TeaserBase: TeaserBase{
-				Title:      raw.TitleCN,
-				Standfirst: raw.LongLeadCN,
-				CoverURL:   raw.CoverURL,
-			},
-			AudioURL: null.NewString(raw.ShortLeadCN, raw.ShortLeadCN != ""),
-		},
+		InteractiveTeaser: raw.AudioTeaser(),
 		Byline:            null.NewString(raw.BylineCN, raw.BylineCN != ""),
 		BodyXML:           raw.BodyEN,
 		AlternativeTitles: AlternativeTitles{},
@@ -91,16 +74,9 @@ func NewAudioArticle(raw *RawInteractive) Interactive {
 // 速读,interactive_search,
 func NewSpeedReading(raw *RawInteractive) Interactive {
 	return Interactive{
-		InteractiveTeaser: InteractiveTeaser{
-			ArticleMeta: raw.ArticleMeta(),
-			TeaserBase: TeaserBase{
-				Title:      raw.TitleCN,
-				Standfirst: raw.ShortLeadCN,
-				CoverURL:   raw.CoverURL,
-			},
-		},
-		Byline:  null.String{},
-		BodyXML: raw.BodyEN,
+		InteractiveTeaser: raw.AudioTeaser(),
+		Byline:            null.String{},
+		BodyXML:           raw.BodyEN,
 		AlternativeTitles: AlternativeTitles{
 			English: raw.TitleEN,
 		},
