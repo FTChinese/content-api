@@ -39,6 +39,9 @@ func (b RawBody) splitCN() ([]string, string) {
 }
 
 func (b RawBody) splitEN() []string {
+	if b.BodyEN == "" {
+		return make([]string, 0)
+	}
 	return strings.Split(b.BodyEN, "\r\n")
 }
 
