@@ -16,21 +16,21 @@ type StoryBase struct {
 
 // Story is the monolingual version.
 type Story struct {
-	ArticleMeta
-	TeaserBase
+	Teaser
 	StoryBase
-	Body       []string    `json:"body"`
-	Translator null.String `json:"translator"`
+	Body       []string      `json:"body"`
+	Translator null.String   `json:"translator"`
+	Related    []ArticleMeta `json:"related"`
 }
 
 func NewStoryCN(raw *RawStory) Story {
 	b, t := raw.splitCN()
 	return Story{
-		ArticleMeta: raw.ArticleMeta(),
-		TeaserBase:  raw.TeaserBaseCN(),
-		StoryBase:   raw.StoryBase(),
-		Body:        b,
-		Translator:  null.NewString(t, t != ""),
+		Teaser:     raw.Teaser(),
+		StoryBase:  raw.StoryBase(),
+		Body:       b,
+		Translator: null.NewString(t, t != ""),
+		Related:    raw.Related,
 	}
 }
 
@@ -39,11 +39,19 @@ func NewStoryEN(raw *RawStory) (Story, error) {
 		return Story{}, errors.New("not found")
 	}
 
+	m := raw.ArticleMeta()
+	m.Title = raw.TitleEN
+
 	return Story{
-		ArticleMeta: raw.ArticleMeta(),
-		TeaserBase:  raw.TeaserBaseEN(),
-		StoryBase:   raw.StoryBase(),
-		Body:        raw.splitEN(),
-		Translator:  null.String{},
+		Teaser: Teaser{
+			ArticleMeta: m,
+			Standfirst:  raw.LongLeadCN,
+			CoverURL:    raw.CoverURL,
+			Tags:        raw.Tags(),
+		},
+		StoryBase:  raw.StoryBase(),
+		Body:       raw.splitEN(),
+		Translator: null.String{},
+		Related:    raw.Related,
 	}, nil
 }

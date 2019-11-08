@@ -7,29 +7,63 @@ import (
 	"strings"
 )
 
+type RawStoryBase struct {
+	ID          string      `json:"id" db:"id"`
+	CreatedAt   chrono.Time `json:"createdAt" db:"created_utc"`
+	UpdatedAt   chrono.Time `json:"updatedAt" db:"updated_utc"`
+	AccessRight int64       `json:"accessRight" db:"access_right"`
+	TitleCN     string      `json:"titleCn" db:"title_cn"`
+	LongLeadCN  string      `json:"standfirst" db:"long_lead_cn"`
+	CoverURL    null.String `json:"coverUrl" db:"cover_url"`
+	Tag         string      `json:"tags" db:"tag"`
+}
+
+func (r *RawStoryBase) Tags() []string {
+	return strings.Split(r.Tag, ",")
+}
+
+func (r *RawStoryBase) MemberTier() enum.Tier {
+	var tier enum.Tier
+	switch r.AccessRight {
+	case 1:
+		tier = enum.TierStandard
+	case 2:
+		tier = enum.TierPremium
+	default:
+		tier = enum.InvalidTier
+	}
+
+	return tier
+}
+
+func (r *RawStoryBase) ArticleMeta() ArticleMeta {
+	return ArticleMeta{
+		ID:         r.ID,
+		Kind:       ContentKindStory,
+		CreatedAt:  r.CreatedAt,
+		UpdatedAt:  r.UpdatedAt,
+		MemberTier: r.MemberTier(),
+		Title:      r.TitleCN,
+	}
+}
+
 // RawStory is used to retrieve an article from db as is.
 type RawStory struct {
-	ID             string      `json:"id" db:"id"`
-	Bilingual      bool        `json:"bilingual"`
-	TitleCN        string      `json:"titleCn" db:"title_cn"`
-	TitleEN        string      `json:"titleEn" db:"title_en"`
-	LongLeadCN     string      `json:"standfirst" db:"long_lead_cn"`
-	CoverURL       null.String `json:"coverUrl" db:"cover_url"`
-	BylineDescCN   string      `json:"bylineDescCn" db:"byline_desc_cn"`
-	BylineDescEN   string      `json:"bylineDescEn" db:"byline_desc_en"`
-	BylineAuthorCN string      `json:"bylineAuthorCn" db:"byline_author_cn"`
-	BylineAuthorEN string      `json:"bylineAuthorEn" db:"byline_author_en"`
-	BylineStatusCN string      `json:"bylineStatusCn" db:"byline_status_cn"`
-	BylineStatusEN string      `json:"bylineStatusEn" db:"byline_status_en"`
-	AccessRight    int64       `json:"accessRight" db:"access_right"`
-	Tag            string      `json:"tags" db:"tag"`
-	Genre          string      `json:"genre" db:"genre"`
-	Topic          string      `json:"topic" db:"topic"`
-	Industry       string      `json:"industry" db:"industry"`
-	Area           string      `json:"area" db:"area"`
-	CreatedAt      chrono.Time `json:"createdAt" db:"created_utc"`
-	UpdatedAt      chrono.Time `json:"updatedAt" db:"updated_utc"`
+	RawStoryBase
+	Bilingual      bool   `json:"bilingual"`
+	TitleEN        string `json:"titleEn" db:"title_en"`
+	BylineDescCN   string `json:"bylineDescCn" db:"byline_desc_cn"`
+	BylineDescEN   string `json:"bylineDescEn" db:"byline_desc_en"`
+	BylineAuthorCN string `json:"bylineAuthorCn" db:"byline_author_cn"`
+	BylineAuthorEN string `json:"bylineAuthorEn" db:"byline_author_en"`
+	BylineStatusCN string `json:"bylineStatusCn" db:"byline_status_cn"`
+	BylineStatusEN string `json:"bylineStatusEn" db:"byline_status_en"`
+	Genre          string `json:"genre" db:"genre"`
+	Topic          string `json:"topic" db:"topic"`
+	Industry       string `json:"industry" db:"industry"`
+	Area           string `json:"area" db:"area"`
 	RawBody
+	Related []ArticleMeta `json:"related"`
 }
 
 func (r *RawStory) Normalize() {
@@ -65,7 +99,7 @@ func (r *RawStory) BylineCN() Byline {
 	}
 
 	nameGroups := strings.Split(r.BylineAuthorCN, ",")
-	pairs := AlignStringPairs(nameGroups, placeGroups)
+	pairs := ZipString(nameGroups, placeGroups)
 
 	for _, v := range pairs {
 
@@ -99,7 +133,7 @@ func (r *RawStory) BylineEN() Byline {
 	}
 
 	nameGroups := strings.Split(r.BylineAuthorEN, ",")
-	pairs := AlignStringPairs(nameGroups, placeGroups)
+	pairs := ZipString(nameGroups, placeGroups)
 
 	for _, v := range pairs {
 
@@ -112,51 +146,6 @@ func (r *RawStory) BylineEN() Byline {
 	return Byline{
 		Organization: r.BylineDescEN,
 		Authors:      authors,
-	}
-}
-
-func (r *RawStory) Tags() []string {
-	return strings.Split(r.Tag, ",")
-}
-
-func (r *RawStory) MemberTier() enum.Tier {
-	var tier enum.Tier
-	switch r.AccessRight {
-	case 1:
-		tier = enum.TierStandard
-	case 2:
-		tier = enum.TierPremium
-	default:
-		tier = enum.InvalidTier
-	}
-
-	return tier
-}
-
-func (r *RawStory) ArticleMeta() ArticleMeta {
-
-	return ArticleMeta{
-		ID:         r.ID,
-		CreatedAt:  r.CreatedAt,
-		UpdatedAt:  r.UpdatedAt,
-		Tags:       r.Tags(),
-		MemberTier: r.MemberTier(),
-	}
-}
-
-func (r *RawStory) TeaserBaseCN() TeaserBase {
-	return TeaserBase{
-		Title:      r.TitleCN,
-		Standfirst: r.LongLeadCN,
-		CoverURL:   r.CoverURL,
-	}
-}
-
-func (r *RawStory) TeaserBaseEN() TeaserBase {
-	return TeaserBase{
-		Title:      r.TitleEN,
-		Standfirst: r.LongLeadCN,
-		CoverURL:   r.CoverURL,
 	}
 }
 
@@ -174,6 +163,8 @@ func (r *RawStory) StoryBase() StoryBase {
 func (r *RawStory) Teaser() Teaser {
 	return Teaser{
 		ArticleMeta: r.ArticleMeta(),
-		TeaserBase:  r.TeaserBaseCN(),
+		Standfirst:  r.LongLeadCN,
+		CoverURL:    r.CoverURL,
+		Tags:        r.Tags(),
 	}
 }

@@ -8,25 +8,21 @@ import (
 
 type ArticleMeta struct {
 	ID         string      `json:"id"`
+	Kind       ContentKind `json:"type"`
 	CreatedAt  chrono.Time `json:"createdAt"`
 	UpdatedAt  chrono.Time `json:"updatedAt"`
-	Tags       []string    `json:"tags"`
 	MemberTier enum.Tier   `json:"tier"`
-}
-
-type TeaserBase struct {
 	Title      string      `json:"title"`
-	Standfirst string      `json:"standfirst"`
-	CoverURL   null.String `json:"coverUrl"`
 }
 
 type Teaser struct {
 	ArticleMeta
-	TeaserBase
+	Standfirst string      `json:"standfirst"`
+	CoverURL   null.String `json:"coverUrl"`
+	Tags       []string    `json:"tags"`
 }
 
 type InteractiveTeaser struct {
-	ArticleMeta
-	TeaserBase
+	Teaser
 	AudioURL null.String `json:"audioUrl"`
 }

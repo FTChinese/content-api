@@ -1,43 +1,36 @@
 package models
 
 import (
-	"errors"
 	"github.com/guregu/null"
 )
 
 type BilingualStory struct {
-	ArticleMeta
-	Title      Bilingual   `json:"title"`
-	Standfirst string      `json:"standfirst"`
-	CoverURL   null.String `json:"coverUrl"`
+	Teaser
 	StoryBase
-	Body       []Bilingual `json:"body"`
-	Translator null.String `json:"translator"`
+	Body              []Bilingual       `json:"body"`
+	Translator        null.String       `json:"translator"`
+	AlternativeTitles AlternativeTitles `json:"alternativeTitles"`
+	Related           []ArticleMeta     `json:"related"`
 }
 
-func NewBilingualStory(raw *RawStory) (BilingualStory, error) {
-
-	if !raw.Bilingual {
-		return BilingualStory{}, errors.New("not found")
-	}
+func NewBilingualStory(raw *RawStory) BilingualStory {
 
 	s := BilingualStory{
-		ArticleMeta: raw.ArticleMeta(),
-		Title: Bilingual{
-			CN: raw.TitleCN,
-			EN: raw.TitleEN,
-		},
-		Standfirst: raw.LongLeadCN,
-		CoverURL:   raw.CoverURL,
+		Teaser:     raw.Teaser(),
 		StoryBase:  raw.StoryBase(),
 		Body:       []Bilingual{},
 		Translator: null.String{},
+		AlternativeTitles: AlternativeTitles{
+			English:   null.StringFrom(raw.TitleEN),
+			Promotion: null.String{},
+		},
+		Related: raw.Related,
 	}
 
 	cnParas, translator := raw.splitCN()
 	s.Translator = null.NewString(translator, translator != "")
 
-	pairs := AlignStringPairs(cnParas, raw.splitEN())
+	pairs := ZipString(cnParas, raw.splitEN())
 
 	for _, v := range pairs {
 		s.Body = append(s.Body, Bilingual{
@@ -46,5 +39,5 @@ func NewBilingualStory(raw *RawStory) (BilingualStory, error) {
 		})
 	}
 
-	return s, nil
+	return s
 }
