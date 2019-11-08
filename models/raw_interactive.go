@@ -57,13 +57,26 @@ func (r *RawInteractive) Tier() enum.Tier {
 	return enum.InvalidTier
 }
 
+func (r *RawInteractive) Tags() []string {
+	return strings.Split(strings.TrimSpace(r.Tag), ",")
+}
+
 func (r *RawInteractive) ArticleMeta() ArticleMeta {
 	return ArticleMeta{
 		ID:         r.ID,
 		CreatedAt:  r.CreatedAt,
 		UpdatedAt:  r.UpdatedAt,
-		Tags:       strings.Split(strings.TrimSpace(r.Tag), ","),
 		MemberTier: r.Tier(),
+		Title:      r.TitleCN,
+	}
+}
+
+func (r *RawInteractive) Teaser() Teaser {
+	return Teaser{
+		ArticleMeta: r.ArticleMeta(),
+		Standfirst:  r.LongLeadCN,
+		CoverURL:    r.CoverURL,
+		Tags:        r.Tags(),
 	}
 }
 
@@ -95,24 +108,14 @@ func (r *RawInteractive) Vocabularies() []Word {
 
 func (r *RawInteractive) AudioTeaser() InteractiveTeaser {
 	return InteractiveTeaser{
-		ArticleMeta: r.ArticleMeta(),
-		TeaserBase: TeaserBase{
-			Title:      r.TitleCN,
-			Standfirst: r.LongLeadCN,
-			CoverURL:   r.CoverURL,
-		},
+		Teaser:   r.Teaser(),
 		AudioURL: null.NewString(r.ShortLeadCN, r.ShortLeadCN != ""),
 	}
 }
 
-func (r *RawInteractive) SpeedReadingTeaser() InteractiveTeaser {
+func (r *RawInteractive) NonAudioTeaser() InteractiveTeaser {
 	return InteractiveTeaser{
-		ArticleMeta: r.ArticleMeta(),
-		TeaserBase: TeaserBase{
-			Title:      r.TitleCN,
-			Standfirst: r.ShortLeadCN,
-			CoverURL:   r.CoverURL,
-		},
+		Teaser: r.Teaser(),
 	}
 }
 
@@ -133,7 +136,7 @@ func (r *RawInteractive) Build() Interactive {
 		i = NewPlainInteractive(r)
 	}
 
-	i.Type = k
+	i.Kind = k
 
 	return i
 }
