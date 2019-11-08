@@ -115,7 +115,11 @@ func (r *RawStory) BylineEN() Byline {
 	}
 }
 
-func (r *RawStory) ArticleMeta() ArticleMeta {
+func (r *RawStory) Tags() []string {
+	return strings.Split(r.Tag, ",")
+}
+
+func (r *RawStory) MemberTier() enum.Tier {
 	var tier enum.Tier
 	switch r.AccessRight {
 	case 1:
@@ -126,12 +130,17 @@ func (r *RawStory) ArticleMeta() ArticleMeta {
 		tier = enum.InvalidTier
 	}
 
+	return tier
+}
+
+func (r *RawStory) ArticleMeta() ArticleMeta {
+
 	return ArticleMeta{
 		ID:         r.ID,
 		CreatedAt:  r.CreatedAt,
 		UpdatedAt:  r.UpdatedAt,
-		Tags:       strings.Split(r.Tag, ","),
-		MemberTier: tier,
+		Tags:       r.Tags(),
+		MemberTier: r.MemberTier(),
 	}
 }
 
