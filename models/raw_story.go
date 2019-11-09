@@ -7,22 +7,11 @@ import (
 	"strings"
 )
 
-type RawStoryBase struct {
-	ID          string      `json:"id" db:"id"`
-	CreatedAt   chrono.Time `json:"createdAt" db:"created_utc"`
-	UpdatedAt   chrono.Time `json:"updatedAt" db:"updated_utc"`
-	AccessRight int64       `json:"accessRight" db:"access_right"`
-	TitleCN     string      `json:"titleCn" db:"title_cn"`
-	LongLeadCN  string      `json:"standfirst" db:"long_lead_cn"`
-	CoverURL    null.String `json:"coverUrl" db:"cover_url"`
-	Tag         string      `json:"tags" db:"tag"`
+type RawPerm struct {
+	AccessRight int64 `json:"accessRight" db:"access_right"`
 }
 
-func (r *RawStoryBase) Tags() []string {
-	return strings.Split(r.Tag, ",")
-}
-
-func (r *RawStoryBase) MemberTier() enum.Tier {
+func (r *RawPerm) MemberTier() enum.Tier {
 	var tier enum.Tier
 	switch r.AccessRight {
 	case 1:
@@ -36,7 +25,24 @@ func (r *RawStoryBase) MemberTier() enum.Tier {
 	return tier
 }
 
-func (r *RawStoryBase) ArticleMeta() ArticleMeta {
+type RawContentBase struct {
+	ID        string      `json:"id" db:"id"`
+	CreatedAt chrono.Time `json:"createdAt" db:"created_utc"`
+	UpdatedAt chrono.Time `json:"updatedAt" db:"updated_utc"`
+	RawPerm
+	TitleCN    string      `json:"titleCn" db:"title_cn"`
+	LongLeadCN string      `json:"standfirst" db:"long_lead_cn"`
+	CoverURL   null.String `json:"coverUrl" db:"cover_url"`
+	Tag        string      `json:"tags" db:"tag"`
+}
+
+// Tags split the tag string into an array of strings.
+func (r *RawContentBase) Tags() []string {
+	return strings.Split(r.Tag, ",")
+}
+
+// ArticleMeta create the meta data of an article.
+func (r *RawContentBase) ArticleMeta() ArticleMeta {
 	return ArticleMeta{
 		ID:         r.ID,
 		Kind:       ContentKindStory,
@@ -47,9 +53,18 @@ func (r *RawStoryBase) ArticleMeta() ArticleMeta {
 	}
 }
 
+func (r *RawContentBase) Teaser() Teaser {
+	return Teaser{
+		ArticleMeta: r.ArticleMeta(),
+		Standfirst:  r.LongLeadCN,
+		CoverURL:    r.CoverURL,
+		Tags:        r.Tags(),
+	}
+}
+
 // RawStory is used to retrieve an article from db as is.
 type RawStory struct {
-	RawStoryBase
+	RawContentBase
 	Bilingual      bool   `json:"bilingual"`
 	TitleEN        string `json:"titleEn" db:"title_en"`
 	BylineDescCN   string `json:"bylineDescCn" db:"byline_desc_cn"`
@@ -157,14 +172,5 @@ func (r *RawStory) StoryBase() StoryBase {
 		Genres:     strings.Split(r.Genre, ","),
 		Industries: strings.Split(r.Industry, ","),
 		Topics:     strings.Split(r.Topic, ","),
-	}
-}
-
-func (r *RawStory) Teaser() Teaser {
-	return Teaser{
-		ArticleMeta: r.ArticleMeta(),
-		Standfirst:  r.LongLeadCN,
-		CoverURL:    r.CoverURL,
-		Tags:        r.Tags(),
 	}
 }

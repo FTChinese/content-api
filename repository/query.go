@@ -7,29 +7,30 @@ const (
 		pubdate AS updated_at,
         accessright AS access_right,
 		cheadline AS title,
-		clongleadbody AS standfirst,
+		clongleadbody AS long_lead_cn,
         cc_piclink AS poster_url,
 		cc_vaddress AS cc_id,
-		TRIM(CONCAT(cdescribe, ' ', cbyline)) AS byline
+        cdescribe AS byline_desc_cn,
+        cbyline AS byline_cn
 	FROM cmstmp01.video_story
 	WHERE id = ?
 		AND publish_status = 'publish'`
 
 	stmtGalleryImages = `
-    SELECT pic_url AS imageUrl,
-		pbody AS caption
+    SELECT TRIM(BOTH FROM pic_url) AS image_url,
+		TRIM(BOTH FROM pbody) AS caption
 	FROM cmstmp01.photonews_picture
 	WHERE photonewsid = ?
 	ORDER BY orders`
 
 	stmtGallery = `
     SELECT photonewsid AS id,
-		cn_title AS title,
-		shortlead AS standfirst,
+        FROM_UNIXTIME(add_times) AS created_utc,
+        accessright AS access_right,
+		cn_title AS title_cn,
+		TRIM(BOTH FROM shortlead) AS long_lead_cn,
 		leadbody AS body,
-		cover AS coverUrl,
-		add_times AS updatedAt,
-		tags AS tag
+		cover AS cover_url
 	FROM cmstmp01.photonews
 	WHERE photonewsid = ?
 	LIMIT 1`

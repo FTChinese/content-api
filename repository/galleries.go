@@ -13,23 +13,23 @@ type galleryResult struct {
 }
 
 func (env ContentEnv) RetrieveGalleryImages(id int64) ([]models.GalleryItem, error) {
-	var items = []models.GalleryItem{}
+	var items = make([]models.GalleryItem, 0)
 
 	if err := env.db.Select(&items, stmtGalleryImages, id); err != nil {
-		return items, err
+		return []models.GalleryItem{}, err
 	}
 
 	return items, nil
 }
 
 func (env ContentEnv) RetrieveGalleryBody(id int64) (models.Gallery, error) {
-	var gallery models.Gallery
+	var data models.RawGallery
 
-	if err := env.db.Get(&gallery, stmtGallery, id); err != nil {
-		return gallery, err
+	if err := env.db.Get(&data, stmtGallery, id); err != nil {
+		return models.Gallery{}, err
 	}
 
-	return gallery, nil
+	return models.NewGallery(&data), nil
 }
 
 func (env ContentEnv) RetrieveGallery(id int64) (models.Gallery, error) {
@@ -65,8 +65,6 @@ func (env ContentEnv) RetrieveGallery(id int64) (models.Gallery, error) {
 	for _, item := range iResult.success {
 		item.Normalize()
 	}
-
-	gResult.success.Normalize()
 
 	gResult.success.Items = iResult.success
 

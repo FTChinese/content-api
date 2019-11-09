@@ -28,7 +28,7 @@ func (env ContentEnv) RetrieveRawStory(id string) (models.RawStory, error) {
 }
 
 func (env ContentEnv) RelatedStories(id string) ([]models.ArticleMeta, error) {
-	var stories []models.RawStoryBase
+	var stories []models.RawContentBase
 
 	if err := env.db.Select(&stories, stmtRelatedStory, id); err != nil {
 		logger.WithField("trace", "ContentEnv.RelatedStories").Error(err)
