@@ -62,10 +62,6 @@ func (env ContentEnv) RetrieveGallery(id int64) (models.Gallery, error) {
 		return models.Gallery{}, gResult.err
 	}
 
-	for _, item := range iResult.success {
-		item.Normalize()
-	}
-
 	gResult.success.Items = iResult.success
 
 	return gResult.success, nil
