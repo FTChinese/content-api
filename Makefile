@@ -16,11 +16,11 @@ run :
 prod :
 	./$(build_dir)/$(BINARY) -production
 
-deploy : linux
-	rsync -v $(build_dir)/linux/$(BINARY) node11:/home/node/go/bin/
-
 linux :
 	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o $(build_dir)/linux/$(BINARY) -v .
+
+deploy : linux
+	rsync -v $(build_dir)/linux/$(BINARY) tk11:/home/node/go/bin/
 
 lastcommit :
 	git log --max-count=1 --pretty=format:%aI\ %h

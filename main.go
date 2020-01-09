@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"gitlab.com/ftchinese/content-api/access"
 	"gitlab.com/ftchinese/content-api/config"
 	"gitlab.com/ftchinese/content-api/controller"
 	"gitlab.com/ftchinese/content-api/repository"
@@ -55,8 +56,9 @@ func main() {
 	}
 
 	//accessGuard := controller.AccessGuard{
-	//	Env: repository.NewOAuthEnv(db),
+	//	env: repository.NewOAuthEnv(db),
 	//}
+	guard := access.NewGuard(db)
 	storyRouter := controller.NewStoryRouter(db)
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
@@ -68,7 +70,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(controller.LogRequest)
 
-	//r.Use(accessGuard.CheckToken)
+	r.Use(guard.CheckToken)
 
 	r.Get("/__version", func(writer http.ResponseWriter, request *http.Request) {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))

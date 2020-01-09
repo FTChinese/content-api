@@ -34,13 +34,4 @@ const (
 	FROM cmstmp01.photonews
 	WHERE photonewsid = ?
 	LIMIT 1`
-
-	stmtOAuth = `
-    SELECT access_token,
-        is_active,
-        expires_in,
-        created_utc
-    FROM oauth.access
-    WHERE access_token = UNHEX(?)
-    LIMIT 1`
 )

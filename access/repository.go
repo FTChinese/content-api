@@ -1,19 +1,18 @@
-package repository
+package access
 
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
-	"gitlab.com/ftchinese/content-api/models"
 	"time"
 )
 
-type OAuthEnv struct {
+type Repo struct {
 	db    *sqlx.DB
 	cache *cache.Cache
 }
 
-func NewOAuthEnv(db *sqlx.DB) OAuthEnv {
-	return OAuthEnv{
+func NewRepo(db *sqlx.DB) Repo {
+	return Repo{
 		db: db,
 		// Default expiration 24 hours, and purges the expired items every hour.
 		cache: cache.New(24*time.Hour, 1*time.Hour),
@@ -22,7 +21,7 @@ func NewOAuthEnv(db *sqlx.DB) OAuthEnv {
 
 // Load tries to load an access token from cache first, then
 // retrieve from db if not found in cache.
-func (env OAuthEnv) Load(token string) (models.OAuthAccess, error) {
+func (env Repo) Load(token string) (OAuthAccess, error) {
 	if acc, ok := env.LoadCachedToken(token); ok {
 		return acc, nil
 	}
@@ -37,8 +36,8 @@ func (env OAuthEnv) Load(token string) (models.OAuthAccess, error) {
 	return acc, nil
 }
 
-func (env OAuthEnv) RetrieveFromDB(token string) (models.OAuthAccess, error) {
-	var access models.OAuthAccess
+func (env Repo) RetrieveFromDB(token string) (OAuthAccess, error) {
+	var access OAuthAccess
 
 	if err := env.db.Get(&access, stmtOAuth, token); err != nil {
 		return access, err
@@ -47,19 +46,19 @@ func (env OAuthEnv) RetrieveFromDB(token string) (models.OAuthAccess, error) {
 	return access, nil
 }
 
-func (env OAuthEnv) CacheToken(token string, access models.OAuthAccess) {
+func (env Repo) CacheToken(token string, access OAuthAccess) {
 	env.cache.Set(token, access, cache.DefaultExpiration)
 }
 
-func (env OAuthEnv) LoadCachedToken(token string) (models.OAuthAccess, bool) {
+func (env Repo) LoadCachedToken(token string) (OAuthAccess, bool) {
 	x, found := env.cache.Get(token)
 	if !found {
-		return models.OAuthAccess{}, false
+		return OAuthAccess{}, false
 	}
 
-	if access, ok := x.(models.OAuthAccess); ok {
+	if access, ok := x.(OAuthAccess); ok {
 		return access, true
 	}
 
-	return models.OAuthAccess{}, false
+	return OAuthAccess{}, false
 }
