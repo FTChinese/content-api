@@ -24,8 +24,12 @@ func (b RawBody) IsEmpty() bool {
 	return b.BodyCN == "" && b.BodyEN == ""
 }
 
-func (b RawBody) splitCN() ([]string, string) {
-	paras := strings.Split(b.BodyCN, "\r\n")
+func (b RawBody) splitCN() []string {
+	return strings.Split(b.BodyCN, "\r\n")
+}
+
+func (b RawBody) splitCNWithTranslator() ([]string, string) {
+	paras := b.splitCN()
 
 	l := len(paras)
 

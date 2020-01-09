@@ -54,9 +54,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	accessGuard := controller.AccessGuard{
-		Env: repository.NewOAuthEnv(db),
-	}
+	//accessGuard := controller.AccessGuard{
+	//	Env: repository.NewOAuthEnv(db),
+	//}
 	storyRouter := controller.NewStoryRouter(db)
 	videoRouter := controller.NewVideoRouter(db)
 	galleryRouter := controller.NewGalleryStory(db)
@@ -68,7 +68,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(controller.LogRequest)
 
-	r.Use(accessGuard.CheckToken)
+	//r.Use(accessGuard.CheckToken)
 
 	r.Get("/__version", func(writer http.ResponseWriter, request *http.Request) {
 		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
@@ -108,12 +108,16 @@ func main() {
 
 	// GET /channels/{pathName}?page=<int>&per_page=<int>
 	r.Route("/channels", func(r chi.Router) {
+		// A list of all channel names
 		r.Get("/", pageRouter.ChannelList)
+		// The details of each channel.
 		r.Get("/{name}", pageRouter.ChannelData)
 	})
 
 	r.Route("/interactive", func(r chi.Router) {
+		// The details of a channel
 		r.Get("/channels/{name}", interactiveRouter.ChannelPage)
+		// The content of an article.
 		r.Get("/contents/{id}", interactiveRouter.Content)
 	})
 

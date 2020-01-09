@@ -20,9 +20,10 @@ type Teaser struct {
 	Standfirst string      `json:"standfirst"`
 	CoverURL   null.String `json:"coverUrl"`
 	Tags       []string    `json:"tags"`
+	AudioURL   null.String `json:"audioUrl"`
 }
 
-type InteractiveTeaser struct {
-	Teaser
-	AudioURL null.String `json:"audioUrl"`
-}
+//type InteractiveTeaser struct {
+//	Teaser
+//	AudioURL null.String `json:"audioUrl"`
+//}

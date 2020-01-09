@@ -157,6 +157,26 @@ func (env ChannelEnv) retrieveChannel(pathName string) (models.ChannelSetting, e
 	return c, nil
 }
 
+// RetrieveTeasers selects all article summary belong to a
+// channel.
+func (env ChannelEnv) RetrieveTeasers(channelID int64, p gorest.Pagination) ([]models.Teaser, error) {
+	var raws = make([]models.RawContentBase, 0)
+	var t = make([]models.Teaser, 0)
+
+	err := env.db.Select(&raws, stmtStoryTeaser,
+		channelID, p.Limit, p.Offset(),
+	)
+	if err != nil {
+		return t, err
+	}
+
+	for _, v := range raws {
+		t = append(t, v.Teaser())
+	}
+
+	return t, err
+}
+
 func (env ChannelEnv) cacheChannel(name string, c models.ChannelSetting) {
 	env.cache.Set(prefixChannelConfig+name, c, cache.DefaultExpiration)
 }
@@ -171,21 +191,7 @@ type teasersResult struct {
 	err     error
 }
 
-// RetrieveTeasers selects all article summary belong to a
-// channel.
-func (env ChannelEnv) RetrieveTeasers(channelID int64, p gorest.Pagination) ([]models.Teaser, error) {
-	var t = make([]models.Teaser, 0)
-
-	err := env.db.Select(&t, stmtStoryTeaser,
-		channelID, p.Limit, p.Offset(),
-	)
-	if err != nil {
-		return t, err
-	}
-
-	return t, err
-}
-
+// LoadPage loads a channel's details by retrieving data concurrently.
 func (env ChannelEnv) LoadPage(channelName string, p gorest.Pagination) (models.ChannelPage, error) {
 	log := logger.WithField("trace", "ChannelEnv.LoadPage")
 

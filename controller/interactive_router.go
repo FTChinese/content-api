@@ -45,19 +45,12 @@ func (router InteractiveRouter) ChannelPage(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	var data []models.InteractiveTeaser
-	if config.ContentKind == models.ContentKindSpeedReading {
-
-		for _, v := range teasers {
-			data = append(data, v.NonAudioTeaser())
-		}
-	} else {
-		for _, v := range teasers {
-			data = append(data, v.AudioTeaser())
-		}
+	var data []models.Teaser
+	for _, v := range teasers {
+		data = append(data, v.Teaser())
 	}
 
-	_ = view.Render(w, view.NewResponse().SetBody(models.InteractivePage{
+	_ = view.Render(w, view.NewResponse().SetBody(models.ChannelPage{
 		ChannelSetting: config,
 		Data:           data,
 	}))

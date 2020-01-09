@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
 	"github.com/FTChinese/go-rest/chrono"
 	"github.com/FTChinese/go-rest/enum"
 	"github.com/guregu/null"
+	"github.com/tidwall/gjson"
 	"strings"
 )
 
@@ -71,15 +73,30 @@ func (r *RawInteractive) ArticleMeta() ArticleMeta {
 	}
 }
 
+// Teaser create a teaser from non-audio articles, excluding
+// speed reading, which using MySQL in a perverted way.
 func (r *RawInteractive) Teaser() Teaser {
 	return Teaser{
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
 		CoverURL:    r.CoverURL,
 		Tags:        r.Tags(),
+		AudioURL:    null.String{},
 	}
 }
 
+func (r *RawInteractive) AudioTeaser() Teaser {
+	return Teaser{
+		ArticleMeta: r.ArticleMeta(),
+		Standfirst:  r.LongLeadCN,
+		CoverURL:    r.CoverURL,
+		Tags:        r.Tags(),
+		AudioURL:    null.NewString(r.ShortLeadCN, r.ShortLeadCN != ""),
+	}
+}
+
+// Vocabularies builds the clongleadbody column
+// into structured data for speed reading.
 func (r *RawInteractive) Vocabularies() []Word {
 	entries := strings.Split(r.LongLeadCN, "\n")
 
@@ -106,16 +123,74 @@ func (r *RawInteractive) Vocabularies() []Word {
 	return words
 }
 
-func (r *RawInteractive) AudioTeaser() InteractiveTeaser {
-	return InteractiveTeaser{
-		Teaser:   r.Teaser(),
-		AudioURL: null.NewString(r.ShortLeadCN, r.ShortLeadCN != ""),
+// PlainInteractive is used to build data for:
+// 企业公告,interactive_search,2019吴晓波青年午餐会,去广告
+// FT研究院,报告,置顶,去广告,会员专享,interactive_search // Delimited by `\n`
+// 一周新闻,教程,入门级
+func (r *RawInteractive) NewPlainInteractive() Interactive {
+	return Interactive{
+		Teaser:  r.Teaser(),
+		Byline:  null.NewString(r.BylineCN, r.BylineCN != ""),
+		BodyXML: r.BodyCN,
 	}
 }
 
-func (r *RawInteractive) NonAudioTeaser() InteractiveTeaser {
-	return InteractiveTeaser{
-		Teaser: r.Teaser(),
+// NewAudioArticle is used to build contents for:
+//                                      Delimiter       Timeline
+// ----------------------------------------------------------------
+// 一波好书,音频,会员专享                     \n               N
+// ----------------------------------------------------------------
+// 每日一词,音频,会员专享                     \n               N
+// ----------------------------------------------------------------
+// 麦可林学英语,音频,会员专享,                 \n              N
+// interactive_search,英语电台
+// ----------------------------------------------------------------
+// 英语电台,interactive_search,             N/A             Y
+// ----------------------------------------------------------------
+// 英语电台,FT Arts,音乐,音乐之生,            \n for Chinese  Y
+// interactive_search                     N/A for English
+// ----------------------------------------------------------------
+// BoomEar艺术播客,音频                      \n              Y
+func (r *RawInteractive) NewAudioArticle() Interactive {
+
+	var timeline [][]AudioTimeline
+	if len(r.BodyCN) > 0 {
+		var result = gjson.Get(r.BodyCN, "text")
+		if result.Exists() {
+			_ = json.Unmarshal([]byte(result.String()), &timeline)
+		}
+	}
+
+	return Interactive{
+		Teaser:            r.AudioTeaser(),
+		Byline:            null.NewString(r.BylineCN, r.BylineCN != ""),
+		BodyXML:           r.BodyEN,
+		AlternativeTitles: AlternativeTitles{},
+		Timeline:          timeline,
+		Quiz:              null.String{},
+	}
+}
+
+// NewSpeedReading is used to build data for:
+// 速读,interactive_search,
+// Its body is not delimited by any separators.
+func (r *RawInteractive) NewSpeedReading() Interactive {
+	return Interactive{
+		Teaser: Teaser{
+			ArticleMeta: r.ArticleMeta(),
+			Standfirst:  r.ShortLeadCN,
+			CoverURL:    r.CoverURL,
+			Tags:        r.Tags(),
+			AudioURL:    null.String{},
+		},
+		Byline:  null.String{},
+		BodyXML: r.BodyEN,
+		AlternativeTitles: AlternativeTitles{
+			English: r.TitleEN,
+		},
+		Timeline:     nil,
+		Vocabularies: r.Vocabularies(),
+		Quiz:         null.StringFrom(r.BodyCN),
 	}
 }
 
@@ -124,16 +199,16 @@ func (r *RawInteractive) Build() Interactive {
 	var i Interactive
 	switch k {
 	case ContentKindReport, ContentKindSponsor, ContentKindArticle:
-		i = NewPlainInteractive(r)
+		i = r.NewPlainInteractive()
 
 	case ContentKindAudio:
-		i = NewAudioArticle(r)
+		i = r.NewAudioArticle()
 
 	case ContentKindSpeedReading:
-		i = NewSpeedReading(r)
+		i = r.NewSpeedReading()
 
 	default:
-		i = NewPlainInteractive(r)
+		i = r.NewPlainInteractive()
 	}
 
 	i.Kind = k

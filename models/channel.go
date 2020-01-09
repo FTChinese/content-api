@@ -37,7 +37,7 @@ type ChannelPage struct {
 	Data []Teaser `json:"data"`
 }
 
-type InteractivePage struct {
-	ChannelSetting
-	Data []InteractiveTeaser `json:"data"`
-}
+//type InteractivePage struct {
+//	ChannelSetting
+//	Data []InteractiveTeaser `json:"data"`
+//}

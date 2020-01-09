@@ -27,7 +27,7 @@ func NewBilingualStory(raw *RawStory) BilingualStory {
 		Related: raw.Related,
 	}
 
-	cnParas, translator := raw.splitCN()
+	cnParas, translator := raw.splitCNWithTranslator()
 	s.Translator = null.NewString(translator, translator != "")
 
 	pairs := ZipString(cnParas, raw.splitEN())

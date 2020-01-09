@@ -24,7 +24,7 @@ type Story struct {
 }
 
 func NewStoryCN(raw *RawStory) Story {
-	b, t := raw.splitCN()
+	b, t := raw.splitCNWithTranslator()
 	return Story{
 		Teaser:     raw.Teaser(),
 		StoryBase:  raw.StoryBase(),
