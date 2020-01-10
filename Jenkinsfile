@@ -8,7 +8,7 @@ pipeline {
             steps {
                 sh 'make build'
                 sh 'make downconfig'
-                archiveArtifacts artifacts: 'build/linux/*', fingerprint: true
+                archiveArtifacts artifacts: 'out/linux/*', fingerprint: true
             }
         }
         stage('Deploy') {
