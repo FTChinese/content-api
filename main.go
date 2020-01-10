@@ -18,17 +18,25 @@ import (
 
 var (
 	buildConfig config.BuildConfig
-	version     string
-	build       string
+	version     string // Current version
+	build       string // Build time
+	commit      string // Commit hash
 )
 
 const port = "8100"
 
 func init() {
-	flag.BoolVar(&buildConfig.Production, "production", false, "Indicate productions environment if present")
+	var production bool
+	flag.BoolVar(&production, "production", false, "Indicate productions environment if present")
 	var v = flag.Bool("v", false, "print current version")
 
 	flag.Parse()
+	buildConfig = config.BuildConfig{
+		Production: production,
+		Version:    version,
+		BuiltAt:    build,
+		Commit:     commit,
+	}
 
 	if *v {
 		fmt.Printf("%s\nBuild at %s\n", version, build)
