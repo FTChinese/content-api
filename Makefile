@@ -44,10 +44,10 @@ build :
 	$(BUILD_LINUX)
 
 downconfig :
-	rsync -v tk11:/home/node/config/$(config_file) $(HOME)/config
+	sudo rsync -v tk11:/home/node/config/$(config_file) /home/node/config
 
 publish :
-	rsync -v $(LINUX_OUT) $(HOME)/go/bin
+	sudo rsync -v $(LINUX_OUT) /home/node/go/bin
 
 restart :
 	sudo supervisorctl restart $(BINARY)
