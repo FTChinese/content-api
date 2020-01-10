@@ -50,7 +50,7 @@ publish :
 	rsync -v $(LINUX_OUT) $(HOME)/go/bin
 
 restart :
-	supervisorctl restart $(BINARY)
+	sudo supervisorctl restart $(BINARY)
 
 clean :
 	go clean -x
