@@ -44,7 +44,7 @@ build :
 	$(BUILD_LINUX)
 
 downconfig :
-	rsync -v tk11:/home/node/config/$(config_file) ./$(HOME)/config
+	rsync -v tk11:/home/node/config/$(config_file) $(HOME)/config
 
 publish :
 	sudo rsync -v $(LINUX_OUT) $(HOME)/go/bin
