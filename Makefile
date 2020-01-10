@@ -47,10 +47,10 @@ downconfig :
 	rsync -v tk11:/home/node/config/$(config_file) ./$(HOME)/config
 
 publish :
-	rsync -v $(LINUX_OUT) $(HOME)/go/bin
+	sudo rsync -v $(LINUX_OUT) $(HOME)/go/bin
 
 restart :
-	supervisorctl restart $(BINARY)
+	sudo supervisorctl restart $(BINARY)
 
 clean :
 	go clean -x
