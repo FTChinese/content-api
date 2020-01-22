@@ -26,7 +26,7 @@ type RawInteractive struct {
 	RawBody
 }
 
-func (r *RawInteractive) Kind() ContentKind {
+func (r RawInteractive) Kind() ContentKind {
 	switch {
 	case strings.Contains(r.Tag, "企业公告"):
 		return ContentKindSponsor
@@ -51,19 +51,19 @@ func (r *RawInteractive) Kind() ContentKind {
 	}
 }
 
-func (r *RawInteractive) Tier() enum.Tier {
+func (r RawInteractive) Tier() enum.Tier {
 	if strings.Contains(r.Tag, "会员专享") {
 		return enum.TierStandard
 	}
 
-	return enum.InvalidTier
+	return enum.TierNull
 }
 
-func (r *RawInteractive) Tags() []string {
+func (r RawInteractive) Tags() []string {
 	return strings.Split(strings.TrimSpace(r.Tag), ",")
 }
 
-func (r *RawInteractive) ArticleMeta() ArticleMeta {
+func (r RawInteractive) ArticleMeta() ArticleMeta {
 	return ArticleMeta{
 		ID:         r.ID,
 		CreatedAt:  r.CreatedAt,
@@ -75,7 +75,7 @@ func (r *RawInteractive) ArticleMeta() ArticleMeta {
 
 // Teaser create a teaser from non-audio articles, excluding
 // speed reading, which using MySQL in a perverted way.
-func (r *RawInteractive) Teaser() Teaser {
+func (r RawInteractive) Teaser() Teaser {
 	return Teaser{
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
@@ -85,7 +85,7 @@ func (r *RawInteractive) Teaser() Teaser {
 	}
 }
 
-func (r *RawInteractive) AudioTeaser() Teaser {
+func (r RawInteractive) AudioTeaser() Teaser {
 	return Teaser{
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
@@ -97,7 +97,7 @@ func (r *RawInteractive) AudioTeaser() Teaser {
 
 // Vocabularies builds the clongleadbody column
 // into structured data for speed reading.
-func (r *RawInteractive) Vocabularies() []Word {
+func (r RawInteractive) Vocabularies() []Word {
 	entries := strings.Split(r.LongLeadCN, "\n")
 
 	var words = make([]Word, 0)
@@ -127,7 +127,7 @@ func (r *RawInteractive) Vocabularies() []Word {
 // 企业公告,interactive_search,2019吴晓波青年午餐会,去广告
 // FT研究院,报告,置顶,去广告,会员专享,interactive_search // Delimited by `\n`
 // 一周新闻,教程,入门级
-func (r *RawInteractive) NewPlainInteractive() Interactive {
+func (r RawInteractive) NewPlainInteractive() Interactive {
 	return Interactive{
 		Teaser:  r.Teaser(),
 		Byline:  null.NewString(r.BylineCN, r.BylineCN != ""),
@@ -151,7 +151,7 @@ func (r *RawInteractive) NewPlainInteractive() Interactive {
 // interactive_search                     N/A for English
 // ----------------------------------------------------------------
 // BoomEar艺术播客,音频                      \n              Y
-func (r *RawInteractive) NewAudioArticle() Interactive {
+func (r RawInteractive) NewAudioArticle() Interactive {
 
 	var timeline [][]AudioTimeline
 	if len(r.BodyCN) > 0 {
@@ -174,7 +174,7 @@ func (r *RawInteractive) NewAudioArticle() Interactive {
 // NewSpeedReading is used to build data for:
 // 速读,interactive_search,
 // Its body is not delimited by any separators.
-func (r *RawInteractive) NewSpeedReading() Interactive {
+func (r RawInteractive) NewSpeedReading() Interactive {
 	return Interactive{
 		Teaser: Teaser{
 			ArticleMeta: r.ArticleMeta(),
@@ -194,7 +194,7 @@ func (r *RawInteractive) NewSpeedReading() Interactive {
 	}
 }
 
-func (r *RawInteractive) Build() Interactive {
+func (r RawInteractive) Build() Interactive {
 	k := r.Kind()
 	var i Interactive
 	switch k {
