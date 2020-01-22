@@ -6,7 +6,8 @@ type StringPair struct {
 }
 
 // ZipString match the elements of two arrays
-// on the same index into a StringPair
+// on the same index into a StringPair.
+// Pitfall: DO remember to call index++.
 func ZipString(a, b []string) []StringPair {
 	var pairs []StringPair
 
@@ -15,31 +16,37 @@ func ZipString(a, b []string) []StringPair {
 	var bLen = len(b)
 
 	for aIndex < aLen && bIndex < bLen {
-		p := StringPair{
+		pairs = append(pairs, StringPair{
 			First:  a[aIndex],
 			Second: b[bIndex],
-		}
-
-		pairs = append(pairs, p)
+		})
 		aIndex++
 		bIndex++
 	}
 
+	// Handle dangling elements if a has more elements than b
 	for aIndex < aLen {
-		p := StringPair{
+		pairs = append(pairs, StringPair{
 			First:  a[aIndex],
 			Second: "",
-		}
-		pairs = append(pairs, p)
+		})
+		// DON'T forget this!
+		// It causes infinite loop if this block is run
+		// and you forgot this.
 		aIndex++
 	}
 
+	// Handle dangling elements if b has more elements than a.
 	for bIndex < bLen {
-		p := StringPair{
+		pairs = append(pairs, StringPair{
 			First:  "",
 			Second: b[bIndex],
-		}
-		pairs = append(pairs, p)
+		})
+
+		// DON'T forget this!
+		// It causes infinite loop if this block is run
+		// and you forgot this.
+		bIndex++
 	}
 
 	return pairs
