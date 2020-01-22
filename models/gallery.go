@@ -6,12 +6,6 @@ import (
 
 const imageBaseURL = "http://i.ftimg.net/"
 
-// RawGallery is the scan target of DB.
-type RawGallery struct {
-	RawContentBase
-	Body string `db:"body"`
-}
-
 // GalleryItem is a image url with its caption
 type GalleryItem struct {
 	// Image URL should be prepended with http://i.ftimg.net/
@@ -26,11 +20,16 @@ type Gallery struct {
 	Items []GalleryItem `json:"items"`
 }
 
-// NewGallery creates a Gallery instance from raw data retrieved from DB.
-func NewGallery(raw *RawGallery) Gallery {
+// RawGallery is the scan target of DB.
+type RawGallery struct {
+	RawContentBase
+	Body string `db:"body"`
+}
+
+func (r RawGallery) Build() Gallery {
 	return Gallery{
-		Teaser: raw.Teaser(),
-		Body:   strings.TrimSpace(raw.Body),
+		Teaser: r.Teaser(),
+		Body:   strings.TrimSpace(r.Body),
 		Items:  []GalleryItem{},
 	}
 }
