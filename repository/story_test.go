@@ -3,7 +3,6 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
-	"gitlab.com/ftchinese/content-api/models"
 	"testing"
 )
 
@@ -29,9 +28,9 @@ func init() {
 	}
 }
 
-func TestEnv_RetrieveRawStory(t *testing.T) {
+func TestStoryEnv_retrieveRawStory(t *testing.T) {
 
-	env := ContentEnv{db: DB}
+	env := StoryEnv{db: DB}
 
 	type args struct {
 		id string
@@ -49,17 +48,17 @@ func TestEnv_RetrieveRawStory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := env.RetrieveRawStory(tt.args.id)
+			got, err := env.retrieveRawStory(tt.args.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveRawStory() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("retrieveRawStory() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			t.Logf("Raw story: %+v\n", got)
 
-			t.Logf("CN story: %+v", models.NewStoryCN(&got))
+			t.Logf("CN story: %+v", got.BuildEN())
 
-			storyEN, err := models.NewStoryEN(&got)
+			storyEN, err := got.BuildEN()
 			if err != nil {
 				t.Error(err)
 			}
@@ -69,8 +68,8 @@ func TestEnv_RetrieveRawStory(t *testing.T) {
 	}
 }
 
-func TestContentEnv_RelatedStories(t *testing.T) {
-	env := NewContentEnv(DB)
+func TestStoryEnv_retrieveRelatedStories(t *testing.T) {
+	env := NewStoryEnv(DB)
 
 	type args struct {
 		id string
@@ -89,9 +88,9 @@ func TestContentEnv_RelatedStories(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := env.RelatedStories(tt.args.id)
+			got, err := env.retrieveRelatedStories(tt.args.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RelatedStories() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("retrieveRelatedStories() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
