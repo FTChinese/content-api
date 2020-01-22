@@ -131,6 +131,23 @@ func (env InteractiveEnv) RetrieveTeasers(keyWords string, p gorest.Pagination) 
 	return teasers, nil
 }
 
+func (env InteractiveEnv) LoadRawContent(id int64) (models.RawInteractive, error) {
+	log := logger.WithField("trace", "InteractiveEnv.LoadRawContent")
+
+	if i, ok := env.getCachedContent(id); ok {
+		log.Infof("Loaded raw interactive article %d from cache", id)
+		return i, nil
+	}
+
+	i, err := env.RetrieveRawContent(id)
+	if err != nil {
+		log.Error(err)
+		return models.RawInteractive{}, err
+	}
+
+	return i, nil
+}
+
 func (env InteractiveEnv) RetrieveRawContent(id int64) (models.RawInteractive, error) {
 	var c models.RawInteractive
 
@@ -139,4 +156,23 @@ func (env InteractiveEnv) RetrieveRawContent(id int64) (models.RawInteractive, e
 	}
 
 	return c, nil
+}
+
+func (env InteractiveEnv) cacheRawContent(r models.RawInteractive) {
+	logger.WithField("trace", "InteractiveEnv.cacheRawContent").Infof("Cache raw interactive %d", r.ID)
+
+	env.cache.Set(string(r.ID), r, cache.DefaultExpiration)
+}
+
+func (env InteractiveEnv) getCachedContent(id int64) (models.RawInteractive, bool) {
+	x, found := env.cache.Get(string(id))
+	if !found {
+		return models.RawInteractive{}, false
+	}
+
+	if r, ok := x.(models.RawInteractive); ok {
+		return r, true
+	}
+
+	return models.RawInteractive{}, false
 }
