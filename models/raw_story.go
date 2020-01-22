@@ -11,7 +11,7 @@ type RawPerm struct {
 	AccessRight int64 `json:"accessRight" db:"access_right"`
 }
 
-func (r *RawPerm) MemberTier() enum.Tier {
+func (r RawPerm) MemberTier() enum.Tier {
 	var tier enum.Tier
 	switch r.AccessRight {
 	case 1:
@@ -19,7 +19,7 @@ func (r *RawPerm) MemberTier() enum.Tier {
 	case 2:
 		tier = enum.TierPremium
 	default:
-		tier = enum.InvalidTier
+		tier = enum.TierNull
 	}
 
 	return tier
@@ -37,12 +37,12 @@ type RawContentBase struct {
 }
 
 // Tags split the tag string into an array of strings.
-func (r *RawContentBase) Tags() []string {
+func (r RawContentBase) Tags() []string {
 	return strings.Split(r.Tag, ",")
 }
 
 // ArticleMeta create the meta data of an article.
-func (r *RawContentBase) ArticleMeta() ArticleMeta {
+func (r RawContentBase) ArticleMeta() ArticleMeta {
 	return ArticleMeta{
 		ID:         r.ID,
 		Kind:       ContentKindStory,
@@ -53,7 +53,7 @@ func (r *RawContentBase) ArticleMeta() ArticleMeta {
 	}
 }
 
-func (r *RawContentBase) Teaser() Teaser {
+func (r RawContentBase) Teaser() Teaser {
 	return Teaser{
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
@@ -62,7 +62,7 @@ func (r *RawContentBase) Teaser() Teaser {
 	}
 }
 
-// RawStory is used to retrieve an article from db as is.
+// RetrieveRawStory is used to retrieve an article from db as is.
 type RawStory struct {
 	RawContentBase
 	Bilingual      bool   `json:"bilingual"`
@@ -86,16 +86,16 @@ func (r *RawStory) Normalize() {
 	r.Bilingual = r.BodyCN != "" && r.BodyEN != ""
 }
 
-func (r *RawStory) isBilingual() bool {
-	return r.BodyCN != "" && r.BodyEN != ""
-}
-
 func (r *RawStory) Sanitize() {
 	r.BodyCN = strings.TrimSpace(r.BodyCN)
 	r.BodyEN = strings.TrimSpace(r.BodyEN)
 }
 
-func (r *RawStory) BylineCN() Byline {
+func (r RawStory) isBilingual() bool {
+	return r.BodyCN != "" && r.BodyEN != ""
+}
+
+func (r RawStory) BylineCN() Byline {
 	var authors []Authors
 
 	placeGroups := strings.Split(r.BylineStatusCN, ",")
@@ -130,7 +130,7 @@ func (r *RawStory) BylineCN() Byline {
 	}
 }
 
-func (r *RawStory) BylineEN() Byline {
+func (r RawStory) BylineEN() Byline {
 	var authors []Authors
 
 	placeGroups := strings.Split(r.BylineStatusEN, ",")
@@ -164,7 +164,7 @@ func (r *RawStory) BylineEN() Byline {
 	}
 }
 
-func (r *RawStory) StoryBase() StoryBase {
+func (r RawStory) StoryBase() StoryBase {
 	return StoryBase{
 		Bilingual:  r.isBilingual(),
 		Byline:     r.BylineCN(),
