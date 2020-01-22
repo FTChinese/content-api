@@ -3,7 +3,7 @@ module gitlab.com/ftchinese/content-api
 go 1.12
 
 require (
-	github.com/FTChinese/go-rest v0.1.0
+	github.com/FTChinese/go-rest v0.3.2
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/guregu/null v3.4.0+incompatible

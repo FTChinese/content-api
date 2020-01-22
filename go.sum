@@ -3,6 +3,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/FTChinese/go-rest v0.1.0 h1:1GjpAJts2aaCCA+JElC0J3XCMDe05GNQqfZBWrxSpr0=
 github.com/FTChinese/go-rest v0.1.0/go.mod h1:mNniA0pMlPDtAr9UokwRNo0yDFW0hP/R7G1240MjDp4=
+github.com/FTChinese/go-rest v0.3.2 h1:Jj7HN4ksKqnvZNE6Dh4jaHcT0e2sEcNdl6I28fA1beY=
+github.com/FTChinese/go-rest v0.3.2/go.mod h1:maZLcH5Os/34qV4Fs2cw9Di0lgECYZ6bpqSLQx2h/Dc=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
