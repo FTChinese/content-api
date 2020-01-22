@@ -8,22 +8,24 @@ import (
 )
 
 type GalleryRouter struct {
-	env repository.ContentEnv
+	repo repository.GalleryEnv
 }
 
 func NewGalleryStory(db *sqlx.DB) GalleryRouter {
-	return GalleryRouter{env: repository.NewContentEnv(db)}
+	return GalleryRouter{
+		repo: repository.NewGalleryEnv(db),
+	}
 }
 
 func (router GalleryRouter) Article(w http.ResponseWriter, req *http.Request) {
-	id, err := GetURLParam(req, "id").ToInt()
+	id, err := GetURLParam(req, "id").ToString()
 
 	if err != nil {
 		_ = view.Render(w, view.NewBadRequest(err.Error()))
 		return
 	}
 
-	g, err := router.env.RetrieveGallery(id)
+	g, err := router.repo.LoadGallery(id)
 
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))

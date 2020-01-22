@@ -63,7 +63,7 @@ func (router InteractiveRouter) Content(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	content, err := router.env.RetrieveRawContent(id)
+	content, err := router.env.LoadRawContent(id)
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
 		return

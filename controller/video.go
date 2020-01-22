@@ -8,11 +8,13 @@ import (
 )
 
 type VideoRouter struct {
-	env repository.ContentEnv
+	repo repository.VideoEnv
 }
 
 func NewVideoRouter(db *sqlx.DB) VideoRouter {
-	return VideoRouter{env: repository.NewContentEnv(db)}
+	return VideoRouter{
+		repo: repository.NewVideoEnv(db),
+	}
 }
 
 func (router VideoRouter) Article(w http.ResponseWriter, req *http.Request) {
@@ -23,7 +25,7 @@ func (router VideoRouter) Article(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	video, err := router.env.RetrieveVideo(id)
+	video, err := router.repo.Load(id)
 
 	if err != nil {
 		_ = view.Render(w, view.NewDBFailure(err))
