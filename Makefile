@@ -55,3 +55,6 @@ restart :
 clean :
 	go clean -x
 	rm -rf $(build_dir)/*
+
+attack :
+	vegeta attack -targets=targets.txt -rate=50 -duration=30s -timeout=10s > out/results.bin
