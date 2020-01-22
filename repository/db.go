@@ -53,6 +53,7 @@ func NewDB(c Conn) (*sqlx.DB, error) {
 	// packets.go:36: unexpected EOF
 	//
 	// See https://github.com/go-sql-driver/mysql/issues/674
-	db.SetConnMaxLifetime(time.Second)
+	db.SetConnMaxLifetime(time.Hour)
+	db.SetMaxOpenConns(10)
 	return db, nil
 }
