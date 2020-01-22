@@ -2,20 +2,6 @@ package models
 
 import "github.com/FTChinese/go-rest/enum"
 
-// RawVideo is the scan target in SQL.
-type RawVideo struct {
-	ID        int64  `db:"id"`
-	CreatedAt string `db:"created_date"`
-	UpdateAt  string `db:"updated_date"`
-	RawPerm
-	Title        string `db:"title"`
-	LongLeadCN   string `db:"long_lead_cn"`
-	PostURL      string `db:"poster_url"`
-	CcID         string `db:"cc_id"`
-	BylineDescCN string `db:"byline_desc_cn"`
-	BylineCN     string `db:"byline_cn"`
-}
-
 // Video represents a video news
 type Video struct {
 	ID         int64       `json:"id" db:"id"`
@@ -30,18 +16,32 @@ type Video struct {
 	Byline     string      `json:"byline" db:"byline"`
 }
 
-// NewVideo converts the raw data retrieved from DB to Video type.
-func NewVideo(raw *RawVideo) Video {
+// RawVideo is the scan target in SQL.
+type RawVideo struct {
+	ID        int64  `db:"id"`
+	CreatedAt string `db:"created_date"`
+	UpdateAt  string `db:"updated_date"`
+	RawPerm
+	Title        string `db:"title"`
+	LongLeadCN   string `db:"long_lead_cn"`
+	PostURL      string `db:"poster_url"`
+	CcID         string `db:"cc_id"`
+	BylineDescCN string `db:"byline_desc_cn"`
+	BylineCN     string `db:"byline_cn"`
+}
+
+// Build converts the raw data retrieved from DB to Video type.
+func (r RawVideo) Build() Video {
 	return Video{
-		ID:         raw.ID,
+		ID:         r.ID,
 		Kind:       ContentKindVideo,
-		CreatedAt:  raw.CreatedAt,
-		UpdatedAt:  raw.UpdateAt,
-		MemberTier: raw.MemberTier(),
-		Title:      raw.Title,
-		Standfirst: raw.LongLeadCN,
-		CoverURL:   raw.PostURL,
-		CcID:       raw.CcID,
-		Byline:     raw.BylineDescCN + " " + raw.BylineCN,
+		CreatedAt:  r.CreatedAt,
+		UpdatedAt:  r.UpdateAt,
+		MemberTier: r.MemberTier(),
+		Title:      r.Title,
+		Standfirst: r.LongLeadCN,
+		CoverURL:   r.PostURL,
+		CcID:       r.CcID,
+		Byline:     r.BylineDescCN + " " + r.BylineCN,
 	}
 }
