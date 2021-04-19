@@ -114,3 +114,12 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+vendor/
+.idea/
+build/
+_docs/**/*.png
+_docs/build
+_docs/**/*.pdf
+text2pdf*
