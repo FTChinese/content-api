@@ -1,60 +1,65 @@
-build_dir := out
-config_file := api.toml
-BINARY := content-api
+version := `git tag -l --sort=-v:refname | head -n 1`
+build_time := `date +%FT%T%z`
+commit := `git log --max-count=1 --pretty=format:%aI_%h`
 
-DEV_OUT := $(build_dir)/$(BINARY)
-LINUX_OUT := $(build_dir)/linux/$(BINARY)
+ldflags := -ldflags "-w -s -X main.version=$(version) -X main.build=$(build_time) -X main.commit=$(commit)"
 
-LOCAL_CONFIG_FILE := $(HOME)/config/$(config_file)
+app_name := content-api
+go_version := go1.15
 
-VERSION := `git describe --tags`
-BUILD := `date +%FT%T%z`
-COMMIT := `git log --max-count=1 --pretty=format:%aI_%h`
+sys := $(shell uname -s)
+hardware := $(shell uname -m)
+build_dir := build
+src_dir := .
 
-LDFLAGS := -ldflags "-w -s -X main.version=${VERSION} -X main.build=${BUILD} -X main.commit=${COMMIT}"
+default_exec := $(build_dir)/$(sys)/$(hardware)/$(app_name)
+compile_default_exec := go build -o $(default_exec) $(ldflags) -tags production -v $(src_dir)
 
-BUILD_LINUX := GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o $(LINUX_OUT) -v .
+linux_x86_exec := $(build_dir)/linux/x86/$(app_name)
+compile_linux_x86 := GOOS=linux GOARCH=amd64 go build -o $(linux_x86_exec) $(ldflags) -tags production -v $(src_dir)
 
-.PHONY: build linux deploy lastcommit mkbuild clean
-# Development
-dev :
-	go build $(LDFLAGS) -o $(DEV_OUT) -v .
+linux_arm_exec := $(build_dir)/linux/arm/$(app_name)
+compile_linux_arm := GOOS=linux GOARM=7 GOARCH=arm go build -o $(linux_arm_exec) $(ldflags) -tags production -v $(src_dir)
 
-# Run development build
+LOCAL_CONFIG_FILE := $(HOME)/config/api.toml
+
+.PHONY: build
+build :
+	@echo "Build dev version $(version)"
+	$(compile_default_exec)
+
+.PHONY: run
 run :
-	./$(DEV_OUT)
+	$(default_exec)
 
-# Cross compiling linux on for dev.
-linux :
-	$(BUILD_LINUX)
+prod :
+	./$(build_dir)/$(BINARY) -production
+
+.PHONY: amd64
+amd64 :
+	@echo "Build production linux version $(version)"
+	$(compile_linux_x86)
+
+.PHONY: arm
+arm :
+	@echo "Build production arm version $(version)"
+	$(compile_linux_arm)
+
+.PHONY: publish
+publish :
+	rsync -v $(linux_x86_exec) tk11:/home/node/go/bin/
+	ssh tk11 supervisorctl restart $(BINARY)
+
+deploy : config
+	rsync -v $(linux_x86_exec) tk11:/home/node/go/bin/
+	ssh tk11 supervisorctl restart $(BINARY)
 
 # From local machine to production server
-# Copy env varaible to server
+# Copy env variables to server
 config :
 	rsync -v $(LOCAL_CONFIG_FILE) tk11:/home/node/config
 
-deploy : config linux
-	rsync -v $(LINUX_OUT) tk11:/home/node/go/bin/
-	ssh tk11 supervisorctl restart $(BINARY)
-
-# For CI/CD
-build :
-	gvm install go1.13.4
-	gvm use go1.13.4
-	$(BUILD_LINUX)
-
-downconfig :
-	sudo rsync -v tk11:/home/node/config/$(config_file) /home/node/config
-
-publish :
-	sudo rsync -v $(LINUX_OUT) /home/node/go/bin
-
-restart :
-	sudo supervisorctl restart $(BINARY)
-
+.PHONY: clean
 clean :
 	go clean -x
-	rm -rf $(build_dir)/*
-
-attack :
-	vegeta attack -targets=targets.txt -rate=50 -duration=30s -timeout=10s > out/results.bin
+	rm build/*
