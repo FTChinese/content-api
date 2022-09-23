@@ -1,77 +1,73 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
-	"github.com/FTChinese/go-rest/view"
+	"github.com/FTChinese/go-rest/render"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"gitlab.com/ftchinese/content-api/access"
-	"gitlab.com/ftchinese/content-api/config"
-	"gitlab.com/ftchinese/content-api/controller"
-	"gitlab.com/ftchinese/content-api/repository"
+	"gitlab.com/ftchinese/content-api/internal/access"
+	"gitlab.com/ftchinese/content-api/internal/controller"
+	"gitlab.com/ftchinese/content-api/pkg/config"
+	"gitlab.com/ftchinese/content-api/pkg/db"
 	"net/http"
 	"os"
 )
 
+//go:embed build/api.toml
+var tomlConfig string
+
+//go:embed build/version
+var version string
+
+//go:embed build/build_time
+var build string
+
+//go:embed build/commit
+var commit string
+
 var (
-	buildConfig config.BuildConfig
-	version     string // Current version
-	build       string // Build time
-	commit      string // Commit hash
+	production bool
 )
 
 const port = "8100"
 
 func init() {
-	var production bool
 	flag.BoolVar(&production, "production", false, "Indicate productions environment if present")
 	var v = flag.Bool("v", false, "print current version")
 
 	flag.Parse()
-	buildConfig = config.BuildConfig{
-		Production: production,
-		Version:    version,
-		BuiltAt:    build,
-		Commit:     commit,
-	}
 
 	if *v {
 		fmt.Printf("%s\nBuild at %s\n", version, build)
 		os.Exit(0)
 	}
 
-	buildConfig.Version = version
-	buildConfig.BuiltAt = build
-
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetOutput(os.Stdout)
-
-	viper.SetConfigName("api")
-	viper.AddConfigPath("$HOME/config")
-	if err := viper.ReadInConfig(); err != nil {
-		os.Exit(1)
-	}
+	config.MustSetupViper([]byte(tomlConfig))
 }
 
 func main() {
-	db, err := repository.NewDB(getDBConn())
-	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+	status := config.ServerStatus{
+		Version:    version,
+		BuiltAt:    build,
+		Commit:     commit,
+		Production: production,
 	}
+
+	logger := config.MustGetLogger(production)
+	myDB := db.MustNewMySQL(config.MustMySQLReadConn())
 
 	//accessGuard := controller.AccessGuard{
 	//	env: repository.NewOAuthEnv(db),
 	//}
-	guard := access.NewGuard(db)
-	storyRouter := controller.NewStoryRouter(db)
-	videoRouter := controller.NewVideoRouter(db)
-	galleryRouter := controller.NewGalleryStory(db)
-	pageRouter := controller.NewPageRouter(db)
-	interactiveRouter := controller.NewAudioRouter(db)
+	guard := access.NewGuard(myDB)
+	storyRoutes := controller.NewStoryRouter(myDB, logger)
+	videoRouter := controller.NewVideoRouter(myDB, logger)
+	galleryRouter := controller.NewGalleryStory(myDB, logger)
+	pageRouter := controller.NewPageRouter(myDB, logger)
+	interactiveRouter := controller.NewAudioRouter(myDB, logger)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -80,17 +76,13 @@ func main() {
 
 	r.Use(guard.CheckToken)
 
-	r.Get("/__version", func(writer http.ResponseWriter, request *http.Request) {
-		_ = view.Render(writer, view.NewResponse().SetBody(buildConfig))
-	})
-
 	r.Route("/__status", func(r chi.Router) {
 		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 			var data = map[string]string{
 				"channelIds": "/__status/channel_ids",
 			}
 
-			_ = view.Render(writer, view.NewResponse().SetBody(data))
+			_ = render.New(writer).OK(data)
 		})
 		r.Get("/channel_ids", pageRouter.InspectChannelMap)
 	})
@@ -108,7 +100,7 @@ func main() {
 			"interactive_contents": "/interactive/contents/{id}",
 		}
 
-		_ = view.Render(writer, view.NewResponse().SetBody(data))
+		_ = render.New(writer).OK(data)
 	})
 
 	r.Route("/front-page", func(r chi.Router) {
@@ -132,34 +124,21 @@ func main() {
 	})
 
 	r.Route("/stories/{id}", func(r chi.Router) {
-		r.Get("/", storyRouter.Raw)
-		r.Get("/cn", storyRouter.CN)
-		r.Get("/en", storyRouter.EN)
-		r.Get("/ce", storyRouter.Bilingual)
+		r.Get("/", storyRoutes.Raw)
+		r.Get("/cn", storyRoutes.CN)
+		r.Get("/en", storyRoutes.EN)
+		r.Get("/ce", storyRoutes.Bilingual)
 	})
 
 	r.Get("/videos/{id}", videoRouter.Article)
 
 	r.Get("/galleries/{id}", galleryRouter.Article)
 
+	r.Get("/__version", func(w http.ResponseWriter, req *http.Request) {
+		_ = render.New(w).OK(status)
+	})
+
 	logrus.Infof("content-api started on port %s", port)
 
 	logrus.Fatal(http.ListenAndServe(":"+port, r))
-}
-
-func getDBConn() repository.Conn {
-	var conn repository.Conn
-	var key = "mysql.dev"
-	if buildConfig.Production {
-		key = "mysql.master"
-	}
-
-	if err := viper.UnmarshalKey(key, &conn); err != nil {
-		logrus.Error(err)
-		os.Exit(1)
-	}
-
-	logrus.Infof("Using MySQL server %s", conn.Host)
-
-	return conn
 }

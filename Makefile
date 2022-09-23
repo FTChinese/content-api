@@ -1,32 +1,31 @@
-version := `git tag -l --sort=-v:refname | head -n 1`
-build_time := `date +%FT%T%z`
-commit := `git log --max-count=1 --pretty=format:%aI_%h`
-
-ldflags := -ldflags "-w -s -X main.version=$(version) -X main.build=$(build_time) -X main.commit=$(commit)"
+config_file_name := api.toml
+local_config_file := $(HOME)/config/api.toml
 
 app_name := content-api
-go_version := go1.15
+go_version := go1.18
 
+current_dir := $(shell pwd)
 sys := $(shell uname -s)
 hardware := $(shell uname -m)
-build_dir := build
-src_dir := .
+src_dir := $(current_dir)
+out_dir := $(current_dir)/out
+build_dir := $(current_dir)/build
 
-default_exec := $(build_dir)/$(sys)/$(hardware)/$(app_name)
-compile_default_exec := go build -o $(default_exec) $(ldflags) -tags production -v $(src_dir)
+default_exec := $(out_dir)/$(sys)/$(hardware)/$(app_name)
 
-linux_x86_exec := $(build_dir)/linux/x86/$(app_name)
-compile_linux_x86 := GOOS=linux GOARCH=amd64 go build -o $(linux_x86_exec) $(ldflags) -tags production -v $(src_dir)
+linux_x86_exec := $(out_dir)/linux/x86/$(app_name)
 
-linux_arm_exec := $(build_dir)/linux/arm/$(app_name)
-compile_linux_arm := GOOS=linux GOARM=7 GOARCH=arm go build -o $(linux_arm_exec) $(ldflags) -tags production -v $(src_dir)
-
-LOCAL_CONFIG_FILE := $(HOME)/config/api.toml
+linux_arm_exec := $(out_dir)/linux/arm/$(app_name)
 
 .PHONY: build
-build :
-	@echo "Build dev version $(version)"
-	$(compile_default_exec)
+build : version
+	go build -o $(default_exec) -tags production -v $(src_dir)
+
+.PHONY: version
+version :
+	git describe --tags > build/version
+	git log --max-count=1 --pretty=format:%aI_%h > build/commit
+	date +%FT%T%z > build/build_time
 
 .PHONY: run
 run :
@@ -38,28 +37,33 @@ prod :
 .PHONY: amd64
 amd64 :
 	@echo "Build production linux version $(version)"
-	$(compile_linux_x86)
+	GOOS=linux GOARCH=amd64 go build -o $(linux_x86_exec) -tags production -v $(src_dir)
 
 .PHONY: arm
 arm :
 	@echo "Build production arm version $(version)"
-	$(compile_linux_arm)
+	GOOS=linux GOARM=7 GOARCH=arm go build -o $(linux_arm_exec) -tags production -v $(src_dir)
+
+.PHONY: config
+config : builddir
+	@echo "* Pulling config  file from server"
+	# Download configuration file
+	rsync -v node@tk11:/home/node/config/$(config_file_name) $(build_dir)/$(config_file_name)
 
 .PHONY: publish
 publish :
 	rsync -v $(linux_x86_exec) tk11:/home/node/go/bin/
 	ssh tk11 supervisorctl restart $(BINARY)
 
-deploy : config
-	rsync -v $(linux_x86_exec) tk11:/home/node/go/bin/
-	ssh tk11 supervisorctl restart $(BINARY)
-
-# From local machine to production server
-# Copy env variables to server
-config :
-	rsync -v $(LOCAL_CONFIG_FILE) tk11:/home/node/config
-
 .PHONY: clean
 clean :
 	go clean -x
 	rm build/*
+
+.PHONY: builddir
+builddir :
+	mkdir -p $(build_dir)
+
+.PHONY: devenv
+devenv : builddir
+	rsync $(HOME)/config/env.dev.toml $(build_dir)/$(config_file_name)
