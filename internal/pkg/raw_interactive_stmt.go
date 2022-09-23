@@ -1,4 +1,4 @@
-package repository
+package pkg
 
 const stmtInteractiveFrom = `
 FROM cmstmp01.interactive_story AS story
@@ -8,10 +8,10 @@ FROM cmstmp01.interactive_story AS story
         ON picture.id = a_p.picture_id
 `
 
-const stmtInteractiveTeaser = `
+const StmtInteractiveTeaser = `
 SELECT story.id,
-    FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
-    FROM_UNIXTIME(story.last_publish_time) AS updated_utc,
+    story.fileupdatetime AS created_utc,
+    story.last_publish_time AS updated_utc,
     story.cheadline AS title_cn,
     story.clongleadbody AS long_lead_cn,
     story.cshortleadbody AS short_lead_cn,
@@ -23,7 +23,7 @@ WHERE find_in_set(?, story.tag)
 ORDER BY story.fileupdatetime DESC
 LIMIT ? OFFSET ?`
 
-const stmtInteractiveContent = `
+const StmtInteractiveContent = `
 SELECT story.id AS id,
     FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
     FROM_UNIXTIME(story.last_publish_time) AS updated_utc,

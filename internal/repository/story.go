@@ -3,20 +3,10 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
-	models2 "gitlab.com/ftchinese/content-api/internal/pkg"
+	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
 	"time"
 )
-
-type rawStoryResult struct {
-	success models2.RawStory
-	err     error
-}
-
-type relatedStoryResult struct {
-	success []models2.ArticleMeta
-	err     error
-}
 
 type StoryEnv struct {
 	db     *sqlx.DB
@@ -34,7 +24,7 @@ func NewStoryEnv(db *sqlx.DB, logger *zap.Logger) StoryEnv {
 
 // LoadRawStory loads raw story from cache first, and from
 // db if not found and cache it.
-func (env StoryEnv) LoadRawStory(id string) (models2.RawStory, error) {
+func (env StoryEnv) LoadRawStory(id string) (pkg.RawStory, error) {
 	defer env.logger.Sync()
 	log := env.logger.Sugar()
 
@@ -46,7 +36,7 @@ func (env StoryEnv) LoadRawStory(id string) (models2.RawStory, error) {
 	story, err := env.RetrieveRawStory(id)
 	if err != nil {
 		log.Error(err)
-		return models2.RawStory{}, err
+		return pkg.RawStory{}, err
 	}
 
 	env.cacheRawStory(story)
@@ -55,37 +45,37 @@ func (env StoryEnv) LoadRawStory(id string) (models2.RawStory, error) {
 	return story, nil
 }
 
-func (env StoryEnv) retrieveRawStory(id string) (models2.RawStory, error) {
+func (env StoryEnv) retrieveRawStory(id string) (pkg.RawStory, error) {
 	defer env.logger.Sync()
 	log := env.logger.Sugar()
 
-	var story models2.RawStory
+	var story pkg.RawStory
 
-	if err := env.db.Get(&story, stmtStory, id); err != nil {
+	if err := env.db.Get(&story, pkg.StmtStory, id); err != nil {
 		log.Error(err)
-		return models2.RawStory{}, err
+		return pkg.RawStory{}, err
 	}
 
-	story.Related = []models2.ArticleMeta{} // So that it won't output null.
+	story.Related = []pkg.ArticleMeta{} // So that it won't output null.
 	story.Sanitize()
 	story.Normalize()
 
 	return story, nil
 }
 
-func (env StoryEnv) retrieveRelatedStories(id string) ([]models2.ArticleMeta, error) {
+func (env StoryEnv) retrieveRelatedStories(id string) ([]pkg.ArticleMeta, error) {
 	defer env.logger.Sync()
 	log := env.logger.Sugar()
 
-	var stories []models2.RawContentBase
+	var stories []pkg.RawContentBase
 
-	if err := env.db.Select(&stories, stmtRelatedStory, id); err != nil {
+	if err := env.db.Select(&stories, pkg.StmtRelatedStory, id); err != nil {
 		log.Error(err)
 
-		return []models2.ArticleMeta{}, err
+		return []pkg.ArticleMeta{}, err
 	}
 
-	var items = make([]models2.ArticleMeta, 0)
+	var items = make([]pkg.ArticleMeta, 0)
 
 	for _, v := range stories {
 		items = append(items, v.ArticleMeta())
@@ -96,55 +86,56 @@ func (env StoryEnv) retrieveRelatedStories(id string) ([]models2.ArticleMeta, er
 
 // RetrieveRawStory retrieves a story and its related
 // articles form DB.
-func (env StoryEnv) RetrieveRawStory(id string) (models2.RawStory, error) {
-	storyChan := make(chan rawStoryResult)
-	relatedChan := make(chan relatedStoryResult)
+func (env StoryEnv) RetrieveRawStory(id string) (pkg.RawStory, error) {
+	storyChan := make(chan pkg.AsyncResult[pkg.RawStory])
+	relatedChan := make(chan pkg.AsyncResult[[]pkg.ArticleMeta])
 
 	go func() {
 		story, err := env.retrieveRawStory(id)
-		storyChan <- rawStoryResult{
-			success: story,
-			err:     err,
+		storyChan <- pkg.AsyncResult[pkg.RawStory]{
+			Value: story,
+			Err:   err,
 		}
 	}()
 
 	go func() {
 		related, err := env.retrieveRelatedStories(id)
-		relatedChan <- relatedStoryResult{
-			success: related,
-			err:     err,
+		relatedChan <- pkg.AsyncResult[[]pkg.ArticleMeta]{
+			Value: related,
+			Err:   err,
 		}
 	}()
 
 	storyResult, relatedResult := <-storyChan, <-relatedChan
 
-	if storyResult.err != nil {
-		return models2.RawStory{}, storyResult.err
+	if storyResult.Err != nil {
+		return pkg.RawStory{}, storyResult.Err
 	}
 
 	// If related stories are not retrieved, leave it empty.
-	if relatedResult.err != nil {
-		return storyResult.success, nil
+	if relatedResult.Err != nil {
+		return pkg.RawStory{}, nil
 	}
 
-	storyResult.success.Related = relatedResult.success
+	rawStory := storyResult.Value
+	rawStory.Related = relatedResult.Value
 
-	return storyResult.success, nil
+	return rawStory, nil
 }
 
-func (env StoryEnv) cacheRawStory(raw models2.RawStory) {
+func (env StoryEnv) cacheRawStory(raw pkg.RawStory) {
 	env.cache.Set(raw.ID, raw, cache.DefaultExpiration)
 }
 
-func (env StoryEnv) getCachedRawStory(id string) (models2.RawStory, bool) {
+func (env StoryEnv) getCachedRawStory(id string) (pkg.RawStory, bool) {
 	x, found := env.cache.Get(id)
 	if !found {
-		return models2.RawStory{}, false
+		return pkg.RawStory{}, false
 	}
 
-	if story, ok := x.(models2.RawStory); ok {
+	if story, ok := x.(pkg.RawStory); ok {
 		return story, true
 	}
 
-	return models2.RawStory{}, false
+	return pkg.RawStory{}, false
 }

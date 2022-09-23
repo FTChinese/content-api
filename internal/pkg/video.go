@@ -18,10 +18,10 @@ type Video struct {
 
 // RawVideo is the scan target in SQL.
 type RawVideo struct {
-	ID        int64  `db:"id"`
-	CreatedAt string `db:"created_date"`
-	UpdateAt  string `db:"updated_date"`
-	RawPerm
+	ID           int64  `db:"id"`
+	CreatedAt    string `db:"created_date"`
+	UpdateAt     string `db:"updated_date"`
+	AccessRight  int64  `json:"accessRight" db:"access_right"`
 	Title        string `db:"title"`
 	LongLeadCN   string `db:"long_lead_cn"`
 	PostURL      string `db:"poster_url"`
@@ -37,7 +37,7 @@ func (r RawVideo) Build() Video {
 		Kind:       ContentKindVideo,
 		CreatedAt:  r.CreatedAt,
 		UpdatedAt:  r.UpdateAt,
-		MemberTier: r.MemberTier(),
+		MemberTier: numToTier(r.AccessRight),
 		Title:      r.Title,
 		Standfirst: r.LongLeadCN,
 		CoverURL:   r.PostURL,

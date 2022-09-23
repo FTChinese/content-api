@@ -1,20 +1,5 @@
 package repository
 
-//const stmtNav = `
-//    SELECT top.id AS id,
-//      top.code AS name,
-//      top.name AS title,
-//      GROUP_CONCAT(
-//        CONCAT_WS(':', sub.code, sub.name) ORDER BY sub.id ASC
-//        SEPARATOR ';'
-//      ) AS children
-//    FROM cmstmp01.channel AS top
-//      INNER JOIN cmstmp01.channel AS sub
-//      ON top.id = sub.reid
-//    WHERE top.reid = 0
-//    GROUP BY top.id
-//	ORDER BY top.priority ASC`
-
 const stmtChannelItem = `
 SELECT id,
     parent_id,

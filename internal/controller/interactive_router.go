@@ -2,9 +2,10 @@ package controller
 
 import (
 	gorest "github.com/FTChinese/go-rest"
+	"github.com/FTChinese/go-rest/render"
 	"github.com/FTChinese/go-rest/view"
 	"github.com/jmoiron/sqlx"
-	models2 "gitlab.com/ftchinese/content-api/internal/pkg"
+	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"gitlab.com/ftchinese/content-api/internal/repository"
 	"go.uber.org/zap"
 	"net/http"
@@ -46,15 +47,15 @@ func (router InteractiveRouter) ChannelPage(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	var data []models2.Teaser
+	var data []pkg.Teaser
 	for _, v := range teasers {
 		data = append(data, v.Teaser())
 	}
 
-	_ = view.Render(w, view.NewResponse().SetBody(models2.ChannelPage{
+	_ = render.New(w).OK(pkg.ChannelPage{
 		ChannelSetting: config,
 		Data:           data,
-	}))
+	})
 }
 
 func (router InteractiveRouter) Content(w http.ResponseWriter, req *http.Request) {
@@ -70,10 +71,5 @@ func (router InteractiveRouter) Content(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	_ = view.Render(
-		w,
-		view.NewResponse().SetBody(
-			content.Build(),
-		),
-	)
+	_ = render.New(w).OK(content.Build())
 }

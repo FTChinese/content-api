@@ -87,15 +87,16 @@ func main() {
 		r.Get("/channel_ids", pageRouter.InspectChannelMap)
 	})
 
+	// Sitemap
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		var data = map[string]string{
 			"home":                 "/front-page/latest",
 			"home_archive":         "/front-page/archives/{date}",
 			"channels_index":       "/channels",
 			"channel_page":         "/channels/{name}",
-			"story":                "/stories/{id}/<cn | en | ce>",
-			"video":                "/videos/{id}",
-			"gallery":              "/galleries/{id}",
+			"story":                "/contents/stories/{id}/<cn | en | ce>",
+			"video":                "/contents/videos/{id}",
+			"gallery":              "/contents/galleries/{id}",
 			"interactive_channels": "/interactive/channels/{name}",
 			"interactive_contents": "/interactive/contents/{id}",
 		}
@@ -123,16 +124,11 @@ func main() {
 		r.Get("/contents/{id}", interactiveRouter.Content)
 	})
 
-	r.Route("/stories/{id}", func(r chi.Router) {
-		r.Get("/", storyRoutes.Raw)
-		r.Get("/cn", storyRoutes.CN)
-		r.Get("/en", storyRoutes.EN)
-		r.Get("/ce", storyRoutes.Bilingual)
+	r.Route("/contents", func(r chi.Router) {
+		r.Get("/stories/{id}", storyRoutes.Raw)
+		r.Get("/videos/{id}", videoRouter.Article)
+		r.Get("/galleries/{id}", galleryRouter.Article)
 	})
-
-	r.Get("/videos/{id}", videoRouter.Article)
-
-	r.Get("/galleries/{id}", galleryRouter.Article)
 
 	r.Get("/__version", func(w http.ResponseWriter, req *http.Request) {
 		_ = render.New(w).OK(status)

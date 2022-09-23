@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"github.com/FTChinese/go-rest/chrono"
 	"github.com/FTChinese/go-rest/enum"
 	"github.com/guregu/null"
 	"github.com/tidwall/gjson"
@@ -11,8 +10,8 @@ import (
 
 type RawInteractive struct {
 	ID          string      `db:"id"`
-	CreatedAt   chrono.Time `db:"created_utc"`
-	UpdatedAt   chrono.Time `db:"updated_utc"`
+	CreatedAt   int64       `db:"created_utc"`
+	UpdatedAt   int64       `db:"updated_utc"`
 	Tag         string      `db:"tag"`
 	TitleCN     string      `db:"title_cn"` // cheadline
 	TitleEN     null.String `db:"title_en"`
@@ -23,7 +22,8 @@ type RawInteractive struct {
 	CoverURL    null.String `db:"cover_url"`
 	// cbody. This is Quiz for Speed Reading, JOSN text for those with MP3 url, plain text for ads.
 	// ebody. This is english text for most, but Chinese text for Michael Learn English.
-	RawBody
+	BodyCN string `json:"bodyCn" db:"body_cn"`
+	BodyEN string `json:"bodyEn" db:"body_en"`
 }
 
 func (r RawInteractive) Kind() ContentKind {
@@ -59,10 +59,6 @@ func (r RawInteractive) Tier() enum.Tier {
 	return enum.TierNull
 }
 
-func (r RawInteractive) Tags() []string {
-	return strings.Split(strings.TrimSpace(r.Tag), ",")
-}
-
 func (r RawInteractive) ArticleMeta() ArticleMeta {
 	return ArticleMeta{
 		ID:         r.ID,
@@ -80,7 +76,7 @@ func (r RawInteractive) Teaser() Teaser {
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
 		CoverURL:    r.CoverURL,
-		Tags:        r.Tags(),
+		Tags:        r.Tag,
 		AudioURL:    null.String{},
 	}
 }
@@ -90,7 +86,7 @@ func (r RawInteractive) AudioTeaser() Teaser {
 		ArticleMeta: r.ArticleMeta(),
 		Standfirst:  r.LongLeadCN,
 		CoverURL:    r.CoverURL,
-		Tags:        r.Tags(),
+		Tags:        r.Tag,
 		AudioURL:    null.NewString(r.ShortLeadCN, r.ShortLeadCN != ""),
 	}
 }
@@ -180,7 +176,7 @@ func (r RawInteractive) NewSpeedReading() Interactive {
 			ArticleMeta: r.ArticleMeta(),
 			Standfirst:  r.ShortLeadCN,
 			CoverURL:    r.CoverURL,
-			Tags:        r.Tags(),
+			Tags:        r.Tag,
 			AudioURL:    null.String{},
 		},
 		Byline:  null.String{},

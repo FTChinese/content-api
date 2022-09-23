@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-const imageBaseURL = "http://i.ftimg.net/"
+const imageBaseURL = "https://i.ftimg.net/"
 
 // GalleryItem is a image url with its caption
 type GalleryItem struct {

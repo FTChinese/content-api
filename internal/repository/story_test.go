@@ -57,13 +57,6 @@ func TestStoryEnv_retrieveRawStory(t *testing.T) {
 			}
 
 			t.Logf("Raw story: %+v\n", got)
-
-			storyEN, err := got.BuildEN()
-			if err != nil {
-				t.Error(err)
-			}
-
-			t.Logf("EN story: %+v", storyEN)
 		})
 	}
 }

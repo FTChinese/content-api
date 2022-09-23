@@ -1,4 +1,4 @@
-package repository
+package pkg
 
 const stmtStoryFrom = `
 FROM cmstmp01.story AS story
@@ -9,8 +9,8 @@ FROM cmstmp01.story AS story
 `
 const stmtSelectStoryMeta = `
 SELECT story.id AS id,
-    FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
-    FROM_UNIXTIME(story.last_publish_time) AS updated_utc,
+    story.fileupdatetime AS created_at,
+    story.last_publish_time AS updated_at,
     story.accessright AS access_right,
     story.cheadline AS title_cn
 `
@@ -21,7 +21,7 @@ const stmtSelectStoryTeaser = stmtSelectStoryMeta + `,
     story.tag AS tag
 `
 
-const stmtStoryTeaser = stmtSelectStoryTeaser + `
+const StmtStoryTeaser = stmtSelectStoryTeaser + `
 FROM cmstmp01.channel_detail AS ch_story
     LEFT JOIN cmstmp01.story 
         ON ch_story.id = story.id
@@ -34,7 +34,7 @@ WHERE ch_story.chaid = ?
 ORDER BY ch_story.addtime DESC
 LIMIT ? OFFSET ?`
 
-const stmtFrontPageToday = stmtSelectStoryTeaser + stmtStoryFrom + `
+const StmtFrontPageToday = stmtSelectStoryTeaser + stmtStoryFrom + `
 WHERE story.publish_status = 'publish'
     AND story.pubdate = (
         SELECT pubdate
@@ -46,14 +46,13 @@ WHERE story.publish_status = 'publish'
 ORDER BY story.priority,
     story.fileupdatetime`
 
-// The front page on a certain date.
-const stmtFrontPageArchive = stmtSelectStoryTeaser + stmtStoryFrom + `
+const StmtFrontPageArchive = stmtSelectStoryTeaser + stmtStoryFrom + `
 WHERE story.publish_status = 'publish'
     AND FROM_UNIXTIME(story.pubdate, "%Y-%m-%d") = ?
 ORDER BY story.priority,
     story.fileupdatetime`
 
-const stmtStory = stmtSelectStoryTeaser + `,
+const StmtStory = stmtSelectStoryTeaser + `,
     story.cheadline AS title_cn,
     story.eheadline AS title_en,
     story.cbyline_description AS byline_desc_cn,
@@ -76,7 +75,7 @@ FROM cmstmp01.story AS story
 WHERE story.id = ?
     AND story.publish_status = 'publish'`
 
-const stmtRelatedStory = stmtSelectStoryMeta + `
+const StmtRelatedStory = stmtSelectStoryMeta + `
 FROM cmstmp01.story2story AS r
     JOIN cmstmp01.story AS story
         ON r.relate_id = story.id

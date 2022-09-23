@@ -6,8 +6,8 @@ import (
 )
 
 type FrontPage struct {
-	Date chrono.Date `json:"date"`
-	Data []Teaser    `json:"data"`
+	Date int64    `json:"date"`
+	Data []Teaser `json:"data"`
 }
 
 type ArchivedFrontPage struct {
@@ -36,8 +36,3 @@ type ChannelPage struct {
 	ChannelSetting
 	Data []Teaser `json:"data"`
 }
-
-//type InteractivePage struct {
-//	ChannelSetting
-//	Data []InteractiveTeaser `json:"data"`
-//}

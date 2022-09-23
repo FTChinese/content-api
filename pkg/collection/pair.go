@@ -1,4 +1,4 @@
-package pkg
+package collection
 
 type StringPair struct {
 	First  string
