@@ -6,8 +6,9 @@ import (
 	"github.com/guregu/null"
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
-	pkg "gitlab.com/ftchinese/content-api/internal/pkg"
+	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
+	"strconv"
 	"time"
 )
 
@@ -167,7 +168,7 @@ func (env InteractiveEnv) cacheRawContent(r pkg.RawInteractive) {
 }
 
 func (env InteractiveEnv) getCachedContent(id int64) (pkg.RawInteractive, bool) {
-	x, found := env.cache.Get(string(id))
+	x, found := env.cache.Get(strconv.FormatInt(id, 10))
 	if !found {
 		return pkg.RawInteractive{}, false
 	}
