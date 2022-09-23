@@ -3,10 +3,10 @@ package controller
 import (
 	gorest "github.com/FTChinese/go-rest"
 	"github.com/FTChinese/go-rest/render"
-	"github.com/FTChinese/go-rest/view"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"gitlab.com/ftchinese/content-api/internal/repository"
+	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -22,28 +22,29 @@ func NewAudioRouter(db *sqlx.DB, logger *zap.Logger) InteractiveRouter {
 }
 
 func (router InteractiveRouter) ChannelPage(w http.ResponseWriter, req *http.Request) {
-	name, err := GetURLParam(req, "name").ToString()
+	name, err := xhttp.GetURLParam(req, "name").ToString()
 	if err != nil {
-		_ = view.Render(w, view.NewBadRequest(err.Error()))
+		_ = render.New(w).BadRequest(err.Error())
 		return
 	}
 
 	config, ok := repository.GetAudioChannelConfig(name)
 
 	if !ok {
-		_ = view.Render(w, view.NewNotFound())
+		_ = render.New(w).NotFound("")
 		return
 	}
 
 	p := gorest.GetPagination(req)
 
 	if config.KeyWords.IsZero() {
-		_ = view.Render(w, view.NewNotFound())
+		_ = render.New(w).NotFound("")
+		return
 	}
 
 	teasers, err := router.env.RetrieveTeasers(config.KeyWords.String, p)
 	if err != nil {
-		_ = view.Render(w, view.NewDBFailure(err))
+		_ = render.New(w).DBError(err)
 		return
 	}
 
@@ -59,15 +60,15 @@ func (router InteractiveRouter) ChannelPage(w http.ResponseWriter, req *http.Req
 }
 
 func (router InteractiveRouter) Content(w http.ResponseWriter, req *http.Request) {
-	id, err := GetURLParam(req, "id").ToInt()
+	id, err := xhttp.GetURLParam(req, "id").ToInt()
 	if err != nil {
-		_ = view.Render(w, view.NewBadRequest(err.Error()))
+		_ = render.New(w).BadRequest(err.Error())
 		return
 	}
 
 	content, err := router.env.LoadRawContent(id)
 	if err != nil {
-		_ = view.Render(w, view.NewDBFailure(err))
+		_ = render.New(w).DBError(err)
 		return
 	}
 

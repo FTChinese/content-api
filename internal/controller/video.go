@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"github.com/FTChinese/go-rest/view"
+	"github.com/FTChinese/go-rest/render"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/ftchinese/content-api/internal/repository"
+	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -19,19 +20,19 @@ func NewVideoRouter(db *sqlx.DB, logger *zap.Logger) VideoRouter {
 }
 
 func (router VideoRouter) Article(w http.ResponseWriter, req *http.Request) {
-	id, err := GetURLParam(req, "id").ToInt()
+	id, err := xhttp.GetURLParam(req, "id").ToInt()
 
 	if err != nil {
-		_ = view.Render(w, view.NewBadRequest(err.Error()))
+		_ = render.New(w).BadRequest(err.Error())
 		return
 	}
 
 	video, err := router.repo.Load(id)
 
 	if err != nil {
-		_ = view.Render(w, view.NewDBFailure(err))
+		_ = render.New(w).DBError(err)
 		return
 	}
 
-	_ = view.Render(w, view.NewResponse().SetBody(video))
+	_ = render.New(w).OK(video)
 }

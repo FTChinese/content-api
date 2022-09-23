@@ -2,7 +2,7 @@ package access
 
 import (
 	"errors"
-	"github.com/FTChinese/go-rest/view"
+	"github.com/FTChinese/go-rest/render"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
@@ -23,7 +23,7 @@ func NewGuard(db *sqlx.DB) Guard {
 func (a Guard) CheckToken(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, req *http.Request) {
 		if err := req.ParseForm(); err != nil {
-			_ = view.Render(w, view.NewBadRequest(err.Error()))
+			_ = render.New(w).BadRequest(err.Error())
 			return
 		}
 
@@ -32,20 +32,20 @@ func (a Guard) CheckToken(next http.Handler) http.Handler {
 		if err != nil {
 			log.Printf("Token not found: %s", err)
 
-			_ = view.Render(w, view.NewForbidden("Invalid access token"))
+			_ = render.New(w).Forbidden("Invalid access token")
 			return
 		}
 
 		access, err := a.env.Load(token)
 
 		if err != nil {
-			_ = view.Render(w, view.NewDBFailure(err))
+			_ = render.New(w).DBError(err)
 			return
 		}
 
 		if access.Expired() || !access.Active {
 			log.Printf("Token %s is either expired or not active", token)
-			_ = view.Render(w, view.NewForbidden("The access token is expired or no longer active"))
+			_ = render.New(w).Forbidden("The access token is expired or no longer active")
 			return
 		}
 

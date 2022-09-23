@@ -7,11 +7,11 @@ import (
 	"github.com/FTChinese/go-rest/render"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/sirupsen/logrus"
 	"gitlab.com/ftchinese/content-api/internal/access"
 	"gitlab.com/ftchinese/content-api/internal/controller"
 	"gitlab.com/ftchinese/content-api/pkg/config"
 	"gitlab.com/ftchinese/content-api/pkg/db"
+	"log"
 	"net/http"
 	"os"
 )
@@ -134,7 +134,7 @@ func main() {
 		_ = render.New(w).OK(status)
 	})
 
-	logrus.Infof("content-api started on port %s", port)
+	log.Printf("content-api started on port %s", port)
 
-	logrus.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
