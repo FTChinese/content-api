@@ -5,6 +5,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
+	"strconv"
 	"time"
 )
 
@@ -56,11 +57,11 @@ func (env VideoEnv) RetrieveVideo(id int64) (pkg.Video, error) {
 
 func (env VideoEnv) cacheVideo(v pkg.Video) {
 
-	env.cache.Set(string(v.ID), v, cache.DefaultExpiration)
+	env.cache.Set(strconv.FormatInt(v.ID, 10), v, cache.DefaultExpiration)
 }
 
 func (env VideoEnv) getCachedVideo(id int64) (pkg.Video, bool) {
-	x, found := env.cache.Get(string(id))
+	x, found := env.cache.Get(strconv.FormatInt(id, 10))
 
 	if !found {
 		return pkg.Video{}, false
