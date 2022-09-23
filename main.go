@@ -125,7 +125,7 @@ func main() {
 	})
 
 	r.Route("/contents", func(r chi.Router) {
-		r.Get("/stories/{id}", storyRoutes.Raw)
+		r.Get("/stories/{id}", storyRoutes.Story)
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
 	})
