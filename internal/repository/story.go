@@ -112,11 +112,6 @@ func (env StoryEnv) RetrieveRawStory(id string) (pkg.RawStory, error) {
 		return pkg.RawStory{}, storyResult.Err
 	}
 
-	// If related stories are not retrieved, leave it empty.
-	if relatedResult.Err != nil {
-		return pkg.RawStory{}, nil
-	}
-
 	rawStory := storyResult.Value
 	rawStory.Related = relatedResult.Value
 
