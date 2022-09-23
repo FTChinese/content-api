@@ -16,7 +16,7 @@ func ReadConfigFile() ([]byte, error) {
 		return nil, err
 	}
 
-	return ioutil.ReadFile(filepath.Join(home, "config", "api.toml"))
+	return ioutil.ReadFile(filepath.Join(home, "config", "env.dev.toml"))
 }
 
 func MustReadConfigFile() []byte {
