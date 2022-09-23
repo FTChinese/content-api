@@ -2,11 +2,13 @@ package repository
 
 import (
 	"github.com/FTChinese/go-rest"
+	"gitlab.com/ftchinese/content-api/pkg/db"
+	"go.uber.org/zap/zaptest"
 	"testing"
 )
 
 func TestInteractiveEnv_RetrieveChannelTeasers(t *testing.T) {
-	env := NewInteractiveEnv(DB)
+	env := NewInteractiveEnv(db.MockDB(), zaptest.NewLogger(t))
 
 	type args struct {
 		keyWords string
@@ -40,7 +42,7 @@ func TestInteractiveEnv_RetrieveChannelTeasers(t *testing.T) {
 }
 
 func TestInteractiveEnv_RetrieveRawContent(t *testing.T) {
-	env := NewInteractiveEnv(DB)
+	env := NewInteractiveEnv(db.MockDB(), zaptest.NewLogger(t))
 
 	type args struct {
 		id int64

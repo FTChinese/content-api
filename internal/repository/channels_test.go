@@ -2,13 +2,14 @@ package repository
 
 import (
 	"github.com/FTChinese/go-rest"
-	models2 "gitlab.com/ftchinese/content-api/internal/pkg"
+	"gitlab.com/ftchinese/content-api/internal/pkg"
+	"go.uber.org/zap/zaptest"
 	"reflect"
 	"testing"
 )
 
 func TestChannelEnv_ListChannels(t *testing.T) {
-	env := NewChannelEnv(DB)
+	env := NewChannelEnv(DB, zaptest.NewLogger(t))
 
 	got, err := env.ListChannels()
 	if err != nil {
@@ -17,11 +18,11 @@ func TestChannelEnv_ListChannels(t *testing.T) {
 
 	t.Logf("Channel list: %+v", got)
 
-	t.Logf("Channel map: %+v", models2.NewChannelMap(got))
+	t.Logf("Channel map: %+v", pkg.NewChannelMap(got))
 }
 
 func TestChannelEnv_retrieveChannel(t *testing.T) {
-	env := NewChannelEnv(DB)
+	env := NewChannelEnv(DB, zaptest.NewLogger(t))
 	type args struct {
 		pathName string
 	}
@@ -55,7 +56,7 @@ func TestChannelEnv_retrieveChannel(t *testing.T) {
 
 func TestChannelEnv_RetrieveTeasers(t *testing.T) {
 
-	env := NewChannelEnv(DB)
+	env := NewChannelEnv(DB, zaptest.NewLogger(t))
 
 	type args struct {
 		channelID int64
@@ -64,7 +65,7 @@ func TestChannelEnv_RetrieveTeasers(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []models2.Teaser
+		want    []pkg.Teaser
 		wantErr bool
 	}{
 		{},

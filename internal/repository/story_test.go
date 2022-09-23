@@ -32,7 +32,7 @@ func init() {
 
 func TestStoryEnv_retrieveRawStory(t *testing.T) {
 
-	env := StoryEnv{db: DB}
+	env := NewStoryEnv(db.MockDB(), zaptest.NewLogger(t))
 
 	type args struct {
 		id string
@@ -44,7 +44,7 @@ func TestStoryEnv_retrieveRawStory(t *testing.T) {
 	}{
 		{
 			name:    "Retrieve raw story",
-			args:    args{id: "001076308"},
+			args:    args{id: "001076320"},
 			wantErr: false,
 		},
 	}
@@ -56,7 +56,7 @@ func TestStoryEnv_retrieveRawStory(t *testing.T) {
 				return
 			}
 
-			t.Logf("Raw story: %+v\n", got)
+			t.Logf("Story story: %+v\n", got)
 		})
 	}
 }
