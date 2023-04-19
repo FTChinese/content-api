@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"time"
+
 	gorest "github.com/FTChinese/go-rest"
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
 	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
-	"time"
 )
 
 const (
@@ -23,8 +24,9 @@ type ChannelEnv struct {
 
 func NewChannelEnv(db *sqlx.DB, logger *zap.Logger) ChannelEnv {
 	return ChannelEnv{
-		db:    db,
-		cache: cache.New(24*time.Hour, 1*time.Hour),
+		db:     db,
+		cache:  cache.New(24*time.Hour, 1*time.Hour),
+		logger: logger,
 	}
 }
 
