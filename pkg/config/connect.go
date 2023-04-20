@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 // Connect represents a connection to a server or database.
@@ -37,4 +38,12 @@ func MustMySQLConn(key string) Connect {
 
 func MustMySQLReadConn() Connect {
 	return MustMySQLConn("mysql.read")
+}
+
+func MustMySQLWriteConn() Connect {
+	return MustMySQLConn("mysql.write")
+}
+
+func MustMySQLDeleteConn() Connect {
+	return MustMySQLConn("mysql.delete")
 }
