@@ -10,8 +10,8 @@ FROM cmstmp01.interactive_story AS story
 
 const StmtInteractiveTeaser = `
 SELECT story.id,
-    story.fileupdatetime AS created_utc,
-    story.last_publish_time AS updated_utc,
+    story.fileupdatetime AS created_at,
+    story.last_publish_time AS updated_at,
     story.cheadline AS title_cn,
     story.clongleadbody AS long_lead_cn,
     story.cshortleadbody AS short_lead_cn,
@@ -25,8 +25,8 @@ LIMIT ? OFFSET ?`
 
 const StmtInteractiveContent = `
 SELECT story.id AS id,
-    FROM_UNIXTIME(story.fileupdatetime) AS created_utc,
-    FROM_UNIXTIME(story.last_publish_time) AS updated_utc,
+    story.fileupdatetime AS created_utc,
+    story.last_publish_time AS updated_utc,
     story.cheadline AS title_cn,
     story.eheadline AS title_en,
     story.clongleadbody AS long_lead_cn,

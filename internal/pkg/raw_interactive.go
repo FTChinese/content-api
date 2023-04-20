@@ -2,24 +2,25 @@ package pkg
 
 import (
 	"encoding/json"
+	"strings"
+
 	"github.com/FTChinese/go-rest/enum"
 	"github.com/guregu/null"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 type RawInteractive struct {
 	ID          string      `db:"id"`
-	CreatedAt   int64       `db:"created_utc"`
-	UpdatedAt   int64       `db:"updated_utc"`
-	Tag         string      `db:"tag"`
-	TitleCN     string      `db:"title_cn"` // cheadline
-	TitleEN     null.String `db:"title_en"`
+	CreatedAt   int64       `db:"created_at"`
+	UpdatedAt   int64       `db:"updated_at"`
+	TitleCN     string      `db:"title_cn"`      // cheadline
 	LongLeadCN  string      `db:"long_lead_cn"`  // clongleadbody. This is used to hold vocabularies in Speed Reading, and Standfirst for others.
-	LongLeadEN  string      `db:"long_lead_en"`  // elongleadbody
 	ShortLeadCN string      `db:"short_lead_cn"` // cshortleadbody. This is used to hold Standfirst for Speed Reading, and MP3 url for others.
 	BylineCN    string      `db:"byline_cn"`
 	CoverURL    null.String `db:"cover_url"`
+	Tag         string      `db:"tag"`
+	TitleEN     null.String `db:"title_en"`
+	LongLeadEN  string      `db:"long_lead_en"` // elongleadbody
 	// cbody. This is Quiz for Speed Reading, JOSN text for those with MP3 url, plain text for ads.
 	// ebody. This is english text for most, but Chinese text for Michael Learn English.
 	BodyCN string `json:"bodyCn" db:"body_cn"`
@@ -132,7 +133,9 @@ func (r RawInteractive) NewPlainInteractive() Interactive {
 }
 
 // NewAudioArticle is used to build contents for:
-//                                      Delimiter       Timeline
+//
+//	Delimiter       Timeline
+//
 // ----------------------------------------------------------------
 // 一波好书,音频,会员专享                     \n               N
 // ----------------------------------------------------------------
