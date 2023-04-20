@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"github.com/FTChinese/go-rest"
-	"gitlab.com/ftchinese/content-api/pkg/db"
-	"go.uber.org/zap/zaptest"
 	"testing"
+
+	gorest "github.com/FTChinese/go-rest"
+	"github.com/FTchinese/content-api/pkg/db"
+	"go.uber.org/zap/zaptest"
 )
 
 func TestInteractiveEnv_RetrieveChannelTeasers(t *testing.T) {

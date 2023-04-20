@@ -9,13 +9,13 @@ import (
 	"os"
 
 	"github.com/FTChinese/go-rest/render"
+	"github.com/FTchinese/content-api/internal/access"
+	"github.com/FTchinese/content-api/internal/controller"
+	"github.com/FTchinese/content-api/pkg/config"
+	"github.com/FTchinese/content-api/pkg/db"
+	"github.com/FTchinese/content-api/pkg/xhttp"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"gitlab.com/ftchinese/content-api/internal/access"
-	"gitlab.com/ftchinese/content-api/internal/controller"
-	"gitlab.com/ftchinese/content-api/pkg/config"
-	"gitlab.com/ftchinese/content-api/pkg/db"
-	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 )
 
 //go:embed build/api.toml

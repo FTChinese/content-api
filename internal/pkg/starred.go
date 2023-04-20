@@ -3,8 +3,8 @@ package pkg
 import (
 	"github.com/FTChinese/go-rest/chrono"
 	"github.com/FTChinese/go-rest/render"
+	"github.com/FTchinese/content-api/pkg/validator"
 	"github.com/guregu/null"
-	"gitlab.com/ftchinese/content-api/pkg/validator"
 )
 
 type StarParams struct {

@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"testing"
+
+	"github.com/FTchinese/content-api/pkg/db"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
-	"gitlab.com/ftchinese/content-api/pkg/db"
 	"go.uber.org/zap/zaptest"
-	"testing"
 )
 
 var DB *sqlx.DB

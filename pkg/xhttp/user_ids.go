@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/FTchinese/content-api/pkg/ids"
 	"github.com/guregu/null"
-	"gitlab.com/ftchinese/content-api/pkg/ids"
 )
 
 func UserIDsFromHeader(h http.Header) ids.UserIDs {

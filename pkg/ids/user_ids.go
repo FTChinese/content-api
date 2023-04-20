@@ -3,8 +3,8 @@ package ids
 import (
 	"errors"
 
+	"github.com/FTchinese/content-api/pkg/sq"
 	"github.com/guregu/null"
-	"gitlab.com/ftchinese/content-api/pkg/sq"
 )
 
 // UserIDs is used to identify an FTC user.

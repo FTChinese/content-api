@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"github.com/FTChinese/go-rest"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
-	"go.uber.org/zap/zaptest"
 	"reflect"
 	"testing"
+
+	gorest "github.com/FTChinese/go-rest"
+	"github.com/FTchinese/content-api/internal/pkg"
+	"go.uber.org/zap/zaptest"
 )
 
 func TestChannelEnv_ListChannels(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/FTChinese/go-rest/render"
+	"github.com/FTchinese/content-api/pkg/xhttp"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 )
 
 var errTokenRequired = errors.New("no access credentials provided")

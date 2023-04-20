@@ -1,15 +1,16 @@
 package repository
 
 import (
+	"strconv"
+	"time"
+
 	gorest "github.com/FTChinese/go-rest"
 	"github.com/FTChinese/go-rest/chrono"
+	"github.com/FTchinese/content-api/internal/pkg"
 	"github.com/guregu/null"
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 var interactiveMap = map[string]pkg.ChannelSetting{

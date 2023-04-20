@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/FTchinese/content-api/internal/pkg"
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
 )
 

@@ -2,10 +2,10 @@ package repository
 
 import (
 	gorest "github.com/FTChinese/go-rest"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
-	"gitlab.com/ftchinese/content-api/pkg/collection"
-	"gitlab.com/ftchinese/content-api/pkg/db"
-	"gitlab.com/ftchinese/content-api/pkg/ids"
+	"github.com/FTchinese/content-api/internal/pkg"
+	"github.com/FTchinese/content-api/pkg/collection"
+	"github.com/FTchinese/content-api/pkg/db"
+	"github.com/FTchinese/content-api/pkg/ids"
 	"go.uber.org/zap"
 )
 

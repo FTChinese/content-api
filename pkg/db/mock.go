@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/FTchinese/content-api/pkg/config"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/ftchinese/content-api/pkg/config"
 )
 
 func ReadConfigFile() ([]byte, error) {

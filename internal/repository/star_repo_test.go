@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	gorest "github.com/FTChinese/go-rest"
+	"github.com/FTchinese/content-api/internal/pkg"
+	"github.com/FTchinese/content-api/pkg/db"
+	"github.com/FTchinese/content-api/pkg/ids"
 	"github.com/guregu/null"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
-	"gitlab.com/ftchinese/content-api/pkg/db"
-	"gitlab.com/ftchinese/content-api/pkg/ids"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 )

@@ -1,14 +1,15 @@
 package controller
 
 import (
+	"net/http"
+
 	gorest "github.com/FTChinese/go-rest"
 	"github.com/FTChinese/go-rest/render"
+	"github.com/FTchinese/content-api/internal/pkg"
+	"github.com/FTchinese/content-api/internal/repository"
+	"github.com/FTchinese/content-api/pkg/xhttp"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/ftchinese/content-api/internal/pkg"
-	"gitlab.com/ftchinese/content-api/internal/repository"
-	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 type InteractiveRouter struct {

@@ -1,4 +1,4 @@
-module gitlab.com/ftchinese/content-api
+module github.com/FTchinese/content-api
 
 go 1.18
 

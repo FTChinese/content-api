@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/FTchinese/content-api/pkg/config"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/ftchinese/content-api/pkg/config"
 )
 
 func NewMySQL(c config.Connect) (*sqlx.DB, error) {
