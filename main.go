@@ -4,6 +4,10 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/FTChinese/go-rest/render"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -11,9 +15,6 @@ import (
 	"gitlab.com/ftchinese/content-api/internal/controller"
 	"gitlab.com/ftchinese/content-api/pkg/config"
 	"gitlab.com/ftchinese/content-api/pkg/db"
-	"log"
-	"net/http"
-	"os"
 )
 
 //go:embed build/api.toml
