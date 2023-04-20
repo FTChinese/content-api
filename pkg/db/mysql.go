@@ -2,11 +2,12 @@ package db
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/ftchinese/content-api/pkg/config"
-	"log"
-	"time"
 )
 
 func NewMySQL(c config.Connect) (*sqlx.DB, error) {
@@ -54,4 +55,18 @@ func MustNewMySQL(c config.Connect) *sqlx.DB {
 	}
 
 	return db
+}
+
+func MustNewMyDBs() ReadWriteMyDBs {
+	return ReadWriteMyDBs{
+		Read:   MustNewMySQL(config.MustMySQLReadConn()),
+		Write:  MustNewMySQL(config.MustMySQLWriteConn()),
+		Delete: MustNewMySQL(config.MustMySQLDeleteConn()),
+	}
+}
+
+type ReadWriteMyDBs struct {
+	Read   *sqlx.DB
+	Write  *sqlx.DB
+	Delete *sqlx.DB
 }

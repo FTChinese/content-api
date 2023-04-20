@@ -3,11 +3,12 @@
 package db
 
 import (
-	"github.com/jmoiron/sqlx"
-	"gitlab.com/ftchinese/content-api/pkg/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/jmoiron/sqlx"
+	"gitlab.com/ftchinese/content-api/pkg/config"
 )
 
 func ReadConfigFile() ([]byte, error) {
@@ -35,4 +36,9 @@ func MustSetupViper() {
 func MockDB() *sqlx.DB {
 	MustSetupViper()
 	return MustNewMySQL(config.MustMySQLReadConn())
+}
+
+func MockMySQL() ReadWriteMyDBs {
+	MustSetupViper()
+	return MustNewMyDBs()
 }
