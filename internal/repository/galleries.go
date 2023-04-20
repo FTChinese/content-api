@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
 	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
-	"time"
 )
 
 type imageResult struct {
@@ -57,7 +58,7 @@ func (env GalleryEnv) LoadGallery(id string) (pkg.Gallery, error) {
 func (env GalleryEnv) retrieveGalleryImages(id string) ([]pkg.GalleryItem, error) {
 	var items = make([]pkg.GalleryItem, 0)
 
-	if err := env.db.Select(&items, stmtGalleryImages, id); err != nil {
+	if err := env.db.Select(&items, pkg.StmtGalleryItem, id); err != nil {
 		return []pkg.GalleryItem{}, err
 	}
 
@@ -67,7 +68,7 @@ func (env GalleryEnv) retrieveGalleryImages(id string) ([]pkg.GalleryItem, error
 func (env GalleryEnv) retrieveGalleryBody(id string) (pkg.Gallery, error) {
 	var data pkg.RawGallery
 
-	if err := env.db.Get(&data, stmtGallery, id); err != nil {
+	if err := env.db.Get(&data, pkg.StmtGallery, id); err != nil {
 		return pkg.Gallery{}, err
 	}
 

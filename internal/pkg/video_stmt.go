@@ -2,8 +2,8 @@ package pkg
 
 const StmtVideo = `
 SELECT id AS id,
-    fileupdatetime AS created_at,
-    pubdate AS updated_at,
+    fileupdatetime AS created_date,
+    pubdate AS updated_date,
     accessright AS access_right,
     cheadline AS title,
     clongleadbody AS long_lead_cn,
