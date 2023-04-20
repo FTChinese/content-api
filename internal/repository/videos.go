@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/patrickmn/go-cache"
 	"gitlab.com/ftchinese/content-api/internal/pkg"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 type VideoEnv struct {
@@ -48,7 +49,7 @@ func (env VideoEnv) Load(id int64) (pkg.Video, error) {
 func (env VideoEnv) RetrieveVideo(id int64) (pkg.Video, error) {
 	var video pkg.RawVideo
 
-	if err := env.db.Get(&video, stmtVideo, id); err != nil {
+	if err := env.db.Get(&video, pkg.StmtVideo, id); err != nil {
 		return pkg.Video{}, err
 	}
 
