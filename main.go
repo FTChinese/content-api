@@ -68,7 +68,6 @@ func main() {
 	videoRouter := controller.NewVideoRouter(myDB, logger)
 	galleryRouter := controller.NewGalleryStory(myDB, logger)
 	pageRouter := controller.NewPageRouter(myDB, logger)
-	interactiveRouter := controller.NewAudioRouter(myDB, logger)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -118,12 +117,12 @@ func main() {
 		r.Get("/{name}", pageRouter.ChannelData)
 	})
 
-	r.Route("/interactive", func(r chi.Router) {
-		// The details of a channel
-		r.Get("/channels/{name}", interactiveRouter.ChannelPage)
-		// The content of an article.
-		r.Get("/contents/{id}", interactiveRouter.Content)
-	})
+	// r.Route("/interactive", func(r chi.Router) {
+	// 	// The details of a channel
+	// 	r.Get("/channels/{name}", interactiveRouter.ChannelPage)
+	// 	// The content of an article.
+	// 	r.Get("/contents/{id}", interactiveRouter.Content)
+	// })
 
 	r.Route("/contents", func(r chi.Router) {
 		r.Get("/stories/{id}", storyRoutes.Story)
