@@ -15,6 +15,7 @@ import (
 	"gitlab.com/ftchinese/content-api/internal/controller"
 	"gitlab.com/ftchinese/content-api/pkg/config"
 	"gitlab.com/ftchinese/content-api/pkg/db"
+	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 )
 
 //go:embed build/api.toml
@@ -58,16 +59,17 @@ func main() {
 	}
 
 	logger := config.MustGetLogger(production)
-	myDB := db.MustNewMySQL(config.MustMySQLReadConn())
+	myDBs := db.MustNewMyDBs()
 
 	//accessGuard := controller.AccessGuard{
 	//	env: repository.NewOAuthEnv(db),
 	//}
-	guard := access.NewGuard(myDB)
-	storyRoutes := controller.NewStoryRouter(myDB, logger)
-	videoRouter := controller.NewVideoRouter(myDB, logger)
-	galleryRouter := controller.NewGalleryStory(myDB, logger)
-	pageRouter := controller.NewPageRouter(myDB, logger)
+	guard := access.NewGuard(myDBs.Read)
+	storyRoutes := controller.NewStoryRouter(myDBs.Read, logger)
+	videoRouter := controller.NewVideoRouter(myDBs.Read, logger)
+	galleryRouter := controller.NewGalleryStory(myDBs.Read, logger)
+	pageRouter := controller.NewPageRouter(myDBs.Read, logger)
+	starRouter := controller.NewStarRouter(myDBs, logger)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -128,6 +130,16 @@ func main() {
 		r.Get("/stories/{id}", storyRoutes.Story)
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
+	})
+
+	r.Route("/starred", func(r chi.Router) {
+		r.Use(xhttp.RequireFtcOrUnionID)
+
+		// ?page=<int>&per_page=<int>
+		r.With(xhttp.FormParsed).Get("/", starRouter.ListStarred)
+		r.Post("/", starRouter.StarArticle)
+		r.Get("/{storyID}", starRouter.IsStarring)
+		r.Delete("/{storyID}", starRouter.UnstarArticle)
 	})
 
 	r.Get("/__version", func(w http.ResponseWriter, req *http.Request) {
