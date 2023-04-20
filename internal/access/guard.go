@@ -2,21 +2,23 @@ package access
 
 import (
 	"errors"
-	"github.com/FTChinese/go-rest/render"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
+
+	"github.com/FTChinese/go-rest/render"
+	"github.com/jmoiron/sqlx"
+	"gitlab.com/ftchinese/content-api/pkg/xhttp"
 )
 
 var errTokenRequired = errors.New("no access credentials provided")
 
 type Guard struct {
-	env Repo
+	env Env
 }
 
 func NewGuard(db *sqlx.DB) Guard {
 	return Guard{
-		env: NewRepo(db),
+		env: NewEnv(db),
 	}
 }
 
@@ -27,7 +29,7 @@ func (a Guard) CheckToken(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := GetBearerAuth(req)
+		token, err := xhttp.GetAccessToken(req)
 
 		if err != nil {
 			log.Printf("Token not found: %s", err)
