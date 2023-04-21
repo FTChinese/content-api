@@ -1,6 +1,6 @@
 module github.com/FTchinese/content-api
 
-go 1.18
+go 1.19
 
 require (
 	github.com/FTChinese/go-rest v0.9.1
