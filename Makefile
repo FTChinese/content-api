@@ -62,7 +62,6 @@ config : builddir
 .PHONY: amd64
 amd64 : version
 	@echo "Build production linux version $(version)"
-	gvm use $(go_version)
 	GOOS=linux GOARCH=amd64 go build -o $(linux_x86_exec) -tags production -v $(src_dir)
 
 # Build linux arm binary
