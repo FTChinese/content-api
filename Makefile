@@ -2,7 +2,7 @@ config_file_name := api.toml
 local_config_file := $(HOME)/config/api.toml
 
 app_name := content-api
-go_version := go1.18
+go_version := go1.19
 
 current_dir := $(shell pwd)
 sys := $(shell uname -s)
@@ -45,6 +45,11 @@ run :
 prod :
 	./$(build_dir)/$(BINARY) -production
 
+.PHONY: install-go
+install-go:
+	@echo "* Install go version $(go_version)"
+	gvm install $(go_version)
+
 # Sync env file to build directory.
 .PHONY: config
 config : builddir
@@ -57,6 +62,7 @@ config : builddir
 .PHONY: amd64
 amd64 : version
 	@echo "Build production linux version $(version)"
+	gvm use $(go_version)
 	GOOS=linux GOARCH=amd64 go build -o $(linux_x86_exec) -tags production -v $(src_dir)
 
 # Build linux arm binary

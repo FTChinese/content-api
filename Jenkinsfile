@@ -6,6 +6,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                sh 'make install-go'
                 sh 'make config'
                 sh 'make amd64'
                 archiveArtifacts artifacts: 'build/linux/*', fingerprint: true
