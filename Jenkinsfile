@@ -6,9 +6,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'make build'
-                sh 'make downconfig'
-                archiveArtifacts artifacts: 'out/linux/*', fingerprint: true
+                sh 'make config'
+                sh 'make amd64'
+                archiveArtifacts artifacts: 'build/linux/*', fingerprint: true
             }
         }
         stage('Deploy') {
@@ -19,7 +19,6 @@ pipeline {
             }
             steps {
                 sh 'make publish'
-                sh 'make restart'
             }
         }
     }
