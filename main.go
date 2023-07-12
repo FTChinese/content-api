@@ -91,12 +91,13 @@ func main() {
 
 	// Sitemap
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+		r.Use(guard.CheckToken)
 		var data = map[string]string{
 			"home":                 "/front-page/latest",
 			"home_archive":         "/front-page/archives/{date}",
 			"channels_index":       "/channels",
 			"channel_page":         "/channels/{name}",
-			"story":                "/contents/stories/{id}/<cn | en | ce>",
+			"story":                "/contents/stories/{id}",
 			"video":                "/contents/videos/{id}",
 			"gallery":              "/contents/galleries/{id}",
 			"interactive_channels": "/interactive/channels/{name}",
@@ -107,12 +108,14 @@ func main() {
 	})
 
 	r.Route("/front-page", func(r chi.Router) {
+		r.Use(guard.CheckToken)
 		r.Get("/latest", pageRouter.TodayFrontPage)
 		r.Get("/archives/{date}", pageRouter.ArchivedFrontPage)
 	})
 
 	// GET /channels/{pathName}?page=<int>&per_page=<int>
 	r.Route("/channels", func(r chi.Router) {
+		r.Use(guard.CheckToken)
 		// A list of all channel names
 		r.Get("/", pageRouter.ChannelList)
 		// The details of each channel.
@@ -127,12 +130,14 @@ func main() {
 	// })
 
 	r.Route("/contents", func(r chi.Router) {
+		r.Use(guard.CheckToken)
 		r.Get("/stories/{id}", storyRoutes.Story)
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
 	})
 
 	r.Route("/starred", func(r chi.Router) {
+		r.Use(guard.CheckToken)
 		r.Use(xhttp.RequireFtcOrUnionID)
 
 		// ?page=<int>&per_page=<int>
