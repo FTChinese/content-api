@@ -77,17 +77,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(controller.LogRequest)
 
-	r.Route("/__status", func(r chi.Router) {
-		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
-			var data = map[string]string{
-				"channelIds": "/__status/channel_ids",
-			}
-
-			_ = render.New(writer).OK(data)
-		})
-		r.Get("/channel_ids", pageRouter.InspectChannelMap)
-	})
-
 	// Sitemap
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		r.Use(guard.CheckToken)
@@ -97,10 +86,10 @@ func main() {
 			"channels_index":       "/channels",
 			"channel_page":         "/channels/{name}",
 			"story":                "/contents/stories/{id}",
+			"interactive":          "/contents/interactive/{id}",
 			"video":                "/contents/videos/{id}",
 			"gallery":              "/contents/galleries/{id}",
 			"interactive_channels": "/interactive/channels/{name}",
-			"interactive_contents": "/interactive/contents/{id}",
 		}
 
 		_ = render.New(writer).OK(data)
@@ -130,7 +119,7 @@ func main() {
 	r.Route("/contents", func(r chi.Router) {
 		r.Use(guard.CheckToken)
 		r.Get("/stories/{id}", storyRoutes.Story)
-		r.Get("/contents/{id}", interactiveRoutes.Content)
+		r.Get("/interactive/{id}", interactiveRoutes.Content)
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
 	})
@@ -147,6 +136,17 @@ func main() {
 		r.Post("/", starRouter.StarArticle)
 		r.Get("/{storyID}", starRouter.IsStarring)
 		r.Delete("/{storyID}", starRouter.UnstarArticle)
+	})
+
+	r.Route("/__status", func(r chi.Router) {
+		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+			var data = map[string]string{
+				"channelIds": "/__status/channel_ids",
+			}
+
+			_ = render.New(writer).OK(data)
+		})
+		r.Get("/channel_ids", pageRouter.InspectChannelMap)
 	})
 
 	r.Get("/__version", func(w http.ResponseWriter, req *http.Request) {
