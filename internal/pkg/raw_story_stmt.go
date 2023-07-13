@@ -53,7 +53,6 @@ ORDER BY story.priority,
     story.fileupdatetime`
 
 const StmtStory = stmtSelectStoryTeaser + `,
-    story.cheadline AS title_cn,
     story.eheadline AS title_en,
     story.cbyline_description AS byline_desc_cn,
     story.ebyline_description AS byline_desc_en,
