@@ -66,6 +66,7 @@ func main() {
 	//}
 	guard := access.NewGuard(myDBs.Read)
 	storyRoutes := controller.NewStoryRouter(myDBs.Read, logger)
+	interactiveRoutes := controller.NewInteractiveRouter(myDBs.Read, logger)
 	videoRouter := controller.NewVideoRouter(myDBs.Read, logger)
 	galleryRouter := controller.NewGalleryStory(myDBs.Read, logger)
 	pageRouter := controller.NewPageRouter(myDBs.Read, logger)
@@ -120,16 +121,16 @@ func main() {
 		r.Get("/{name}", pageRouter.ChannelData)
 	})
 
-	// r.Route("/interactive", func(r chi.Router) {
-	// 	// The details of a channel
-	// 	r.Get("/channels/{name}", interactiveRouter.ChannelPage)
-	// 	// The content of an article.
-	// 	r.Get("/contents/{id}", interactiveRouter.Content)
-	// })
+	// TODO: is this needed?
+	r.Route("/interactive", func(r chi.Router) {
+		// The details of a channel
+		r.Get("/channels/{name}", interactiveRoutes.ChannelPage)
+	})
 
 	r.Route("/contents", func(r chi.Router) {
 		r.Use(guard.CheckToken)
 		r.Get("/stories/{id}", storyRoutes.Story)
+		r.Get("/contents/{id}", interactiveRoutes.Content)
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
 	})

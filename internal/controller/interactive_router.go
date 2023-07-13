@@ -16,7 +16,7 @@ type InteractiveRouter struct {
 	env repository.InteractiveEnv
 }
 
-func NewAudioRouter(db *sqlx.DB, logger *zap.Logger) InteractiveRouter {
+func NewInteractiveRouter(db *sqlx.DB, logger *zap.Logger) InteractiveRouter {
 	return InteractiveRouter{
 		env: repository.NewInteractiveEnv(db, logger),
 	}
