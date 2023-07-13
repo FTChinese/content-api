@@ -38,3 +38,19 @@ func (router StoryRouter) Story(w http.ResponseWriter, req *http.Request) {
 
 	_ = render.New(w).OK(pkg.NewStory(story))
 }
+
+func (router StoryRouter) StoryNoCache(w http.ResponseWriter, req *http.Request) {
+	id, err := xhttp.GetURLParam(req, "id").ToString()
+	if err != nil {
+		_ = render.New(w).BadRequest(err.Error())
+		return
+	}
+
+	story, err := router.repo.RetrieveStory(id)
+	if err != nil {
+		_ = render.New(w).DBError(err)
+		return
+	}
+
+	_ = render.New(w).OK(story)
+}

@@ -64,6 +64,15 @@ func (env StoryEnv) retrieveRawStory(id string) (pkg.RawStory, error) {
 	return story, nil
 }
 
+func (env StoryEnv) RetrieveStory(id string) (pkg.Story, error) {
+	raw, err := env.retrieveRawStory(id)
+	if err != nil {
+		return pkg.Story{}, err
+	}
+
+	return pkg.NewStory(raw), nil
+}
+
 func (env StoryEnv) retrieveRelatedStories(id string) ([]pkg.ArticleMeta, error) {
 	defer env.logger.Sync()
 	log := env.logger.Sugar()

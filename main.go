@@ -76,8 +76,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(controller.LogRequest)
 
-	r.Use(guard.CheckToken)
-
 	r.Route("/__status", func(r chi.Router) {
 		r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 			var data = map[string]string{
@@ -135,6 +133,9 @@ func main() {
 		r.Get("/videos/{id}", videoRouter.Article)
 		r.Get("/galleries/{id}", galleryRouter.Article)
 	})
+
+	// Deprecated
+	r.Get("/story/{id}", storyRoutes.StoryNoCache)
 
 	r.Route("/starred", func(r chi.Router) {
 		r.Use(guard.CheckToken)
